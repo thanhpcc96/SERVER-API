@@ -1,0 +1,32 @@
+version: "1"
+
+services:
+  server-api:
+    build:
+      context: .
+    volumes:
+      #mount thu muc cua project cua minh vao thu muc /app ben trong container
+      #Sua doi Code ma không cần phải xây dựng lại image
+      - .:/app
+      # chi can duy nhat 1 duong dan de tao Engine trong 1 Volume
+      # Dữ liệu có trong image tại điểm gắn kết được chỉ định sẽ được sao chép
+      #node_modules tu Volume moi se duoc app su dung va khong dung node_module trong local
+      - /app/node_modules/
+    #Expose port [HOST:CONTAINER}
+    ports:
+      -"3000:3000"
+    
+    # sao chep bien moi trong vao moi truong trong container
+    env_file:
+      -.env
+
+    # Ghi de bien moi truong MONGO
+    environment:
+      -MONGO_URL_DEV=mongodb://mongo/DATN-Thanh
+    # Link services tren may that toi container
+    links:
+      -mongo
+  mongo:
+    image: "mongo"
+    ports:
+      -"27017:27017"  

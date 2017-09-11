@@ -1,0 +1,4 @@
+machine:
+  timezone: Asia/Ho_Chi_Minh
+  node:
+    version: 8.4.0
