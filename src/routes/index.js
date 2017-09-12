@@ -1,6 +1,19 @@
 import { Router } from 'express';
-const route= new Router();
-route.get("/a",(req,res)=>{
+import HTTPStatus from 'http-status';
+
+
+
+import APIError from '../services/error';
+// Middleware 
+import logErrorService from '../services/log';
+
+const routes = new Router();
+
+routes.get("/a", (req, res) => {
     res.status(200).json("jfnfkkm")
 });
-export default route;
+routes.all('*', (req, res, next) => {
+    next(new APIError('Not Found!', HTTPStatus.NOT_FOUND, true));
+});
+routes.use(logErrorService)
+export default routes;
