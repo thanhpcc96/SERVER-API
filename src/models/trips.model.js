@@ -2,7 +2,6 @@
  * Model cho tung chuyen xe
  */
 import mongoose, { Schema } from 'mongoose';
-import uniqueValidator from 'mongoose-unique-validator';
 
 const Trip= new Schema({
     timeStart:{
@@ -23,7 +22,7 @@ const Trip= new Schema({
             required: [true,'Diem den cung phai bat buoc']
         }
     },
-    coachInTrip:{ // nhung xe se chay tren tuyen duong nay
+    chuyenTrongTuyen:{ // nhung chuyen xe se chay tren tuyen duong nay
         type: Schema.Types.ObjectId,
         ref: 'coachs'
     },
