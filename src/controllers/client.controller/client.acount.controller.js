@@ -1,4 +1,4 @@
-import Client from '../models/client.model';
+import Client from '../../models/client.model';
 import { tranporter } from '../config/mailer';
 import kue from 'kue'; // config worker
 import crypto from 'crypto';
@@ -6,6 +6,7 @@ import crypto from 'crypto';
 /*
  ** Post Register Local
  */
+/* eslint-disable-no-else-return */
 export async function _postRegister(req, res) {
     try {
         const client = await Client.findOne({ "local.email": req.body.email });

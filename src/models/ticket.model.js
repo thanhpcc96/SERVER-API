@@ -11,13 +11,17 @@ const TicketSchema = new Schema({
     dateOfStart: {
         type: Date
     },
-    lotrinh: {
+    routeOfTicket: { // lộ trình của vé xe: ví dụ: Hải dương---> Hà Nội thì đi xe Hà Nội--> Hải phòng
         from: {
             type: String,
         },
         to: {
             type: String
         }
+    },
+    inCoach:{
+        type: Schema.Types.ObjectId,
+        ref: 'coachs'
     },
     Customer: {
         type: Schema.Types.ObjectId,
