@@ -6,10 +6,16 @@ import express from 'express'; /* eslint-disable */
 import http from 'http';
 import chalk from 'chalk';
 
+
 import './config/database'; // config database
 import middlewareConfig from './config/middleware';
 import constants from './config/constants';
 import ApiRoutes from './routes';
+import os from 'os';
+import cluster from 'cluster';
+
+
+
 
 import io from './io';
 
@@ -20,6 +26,13 @@ middlewareConfig(app);
 
 // thiet lap router cho ung dung
 app.use('/api/v1', ApiRoutes);
+
+/**
+ * Nếu env là development thì cluster đa nhân cpu
+ */
+if(process.env.NODE_ENV==='development' || process.env.NODE_ENV==="test"){
+    const cpuLenght= os.cpus().length;
+}
 
 const server= http.createServer(app);
 io.attach(server);
