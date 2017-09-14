@@ -49,6 +49,7 @@
     "http-status": "^1.0.1",
     "joi": "^10.6.0",
     "jsonwebtoken": "^8.0.0",
+    "kue": "^0.11.6",
     "method-override": "^2.3.9",
     "mongoose": "^4.11.11",
     "mongoose-unique-validator": "^1.0.5",

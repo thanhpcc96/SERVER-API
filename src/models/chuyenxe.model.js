@@ -2,6 +2,8 @@ import mongoose, { Schema } from 'mongoose';
 
 const chuyen = new Schema({
     sochuyen:{
-        type: String
-    }
+        type: String,
+        unique: true,
+    },
+    
 }, { timestamps: true });
