@@ -48,6 +48,7 @@ if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === "test") {
         console.log('========== Dang trong master     ===========');
         console.log('============================================');
     } else {
+        // thực hiện background job trong cac fork từ cpu ra
         console.log('============================================');
         console.log('========== Dang trong worker     ===========');
         console.log('============================================');
