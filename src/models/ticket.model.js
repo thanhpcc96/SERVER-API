@@ -6,7 +6,8 @@ const TicketSchema = new Schema({
         unique: true
     },
     price: {
-        type: Number
+        type: Number,
+        min:0
     },
     dateOfStart: {
         type: Date
@@ -27,10 +28,24 @@ const TicketSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'clients'
     },
+    coupon:{
+        type: Schema.Types.ObjectId,
+        ref:'coupons'
+    },
     isPayed:{
         type: Boolean,
         default: false
     }
 }, { timestamps: true });
+
+
+// TicketSchema.methods={
+//  /**
+//   * Update tien khi add conpoun
+//   */
+//   _UpdatePriceWithCoupon(){
+      
+//   }
+// }
 
 export default mongoose.model('tickets',TicketSchema);
