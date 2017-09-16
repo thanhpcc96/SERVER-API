@@ -23,7 +23,13 @@ const chuyen = new Schema({
             ref: 'tickets'
         }
     ],
+    choNgoi:{
+        type:Number,
+        min:0
+    },
     tinhtrang:[
 
     ]
 }, { timestamps: true });
+
+export default mongoose.model('chuyen',chuyen);
