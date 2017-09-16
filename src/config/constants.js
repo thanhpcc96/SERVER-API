@@ -33,7 +33,7 @@ const defaultConfig = {
 };
 
 function envConfig(env) {
-    switch (var1) {
+    switch (env) {
         case 'development':
             return devConfig;
         case 'test':
