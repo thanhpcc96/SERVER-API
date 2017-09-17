@@ -15,9 +15,7 @@ const ClientUserSchema = new Schema({
             default: 0,
             min: 0
         },
-        history_recharge: {
-            type: Array
-        },
+        history_recharge: [],
         history_transaction: {
             type: Schema.Types.ObjectId,
             ref: 'tickets'

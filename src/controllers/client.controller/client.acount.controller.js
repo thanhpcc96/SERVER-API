@@ -1,7 +1,7 @@
-import Client from '../../models/client.model';
-import { tranporter } from '../config/mailer';
 import kue from 'kue'; // config worker
 import crypto from 'crypto';
+import Client from '../../models/client.model';
+import { tranporter } from '../config/mailer';
 
 /*
  ** Post Register Local
@@ -13,8 +13,8 @@ export async function _postRegister(req, res) {
         if (client) {
             return res.status(401).json({ error: true, message: 'Tai khoan nay da ton tai' })
         }
-        else {
-            let newClient = new Client();
+       
+            const newClient = new Client();
             newClient.info.firstname = req.body.firstname;
             newClient.info.lastname = req.body.lastname;
             newClient.phone = req.body.phone;
@@ -22,7 +22,7 @@ export async function _postRegister(req, res) {
             newClient.local.password = req.body.password;
             newClient.status = "DEACTIVE"; // chưa kích hoạt
             return res.status(200).json({ error: false, result: await newClient.save() });
-        }
+        
 
     } catch (err) {
         console.log("Loi dang ky: " + err);
