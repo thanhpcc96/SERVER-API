@@ -9,8 +9,8 @@ const ClientUserSchema = new Schema({
         type: String,
         unique: true
     },
-    acount_payment: {
-        balance: {
+    acount_payment: { 
+        balance: { // tai khoan
             type: Number,
             default: 0,
             min: 0

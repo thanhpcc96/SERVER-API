@@ -2,6 +2,7 @@ import HTTPStatus from 'http-status';
 import Client from '../../models/client.model';
 import Ticket from '../../models/ticket.model';
 import Chuyen from '../../models/chuyenxe.model.js';
+import Coupon from '../../models/coupons.model';
 
 
 
@@ -24,4 +25,25 @@ export async function _getAllAvaiableChuyen(req, res) { // lấy danh sách chuy
 
 }
 // Lọc và tìm chuyến dựa vào reactjs xử lý
+/**
+ * Hàm này get thông tin của mã coupon nếu mã này tồn tại thì gửi data về cho
+ * client Reactjs và RN- Được viết bởi PHẠM THÀNH
+ * Hàm này bắn vào router sau thằng middleware chứng thực :))
+ * @param {Object} req - đối tượng request
+ * @param {Object} res - đối tượng response trả về client
+ * @param {function} next - hàm callback để gọi middware khác
+ * @return {function} next() - để thằng middle sau nó được thực thi
+ */
+export function _getCouponInfo(req, res, next) {
+    Coupon.findOne({ code: req.params.code }, (err, coupon) => {
+        if (err) { return next(err) }
+        res.status(HTTPStatus.OK).json({ err: false, result: coupon });
+        return next();
+    });
+}
+
+export function _putPickTicket(req, res, next){
+    
+}
+
 
