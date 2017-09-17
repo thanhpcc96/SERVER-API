@@ -26,7 +26,7 @@ export async function _postRegister(req, res) {
 
     } catch (err) {
         console.log("Loi dang ky: " + err);
-        return res.status(503).json({ error: true, message: 'Co loi xay ra' + err });
+        return res.status(503).json({ error: true, message: 'Co loi xay ra' + err.toString() });
     }
 }
 /*

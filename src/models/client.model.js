@@ -9,17 +9,19 @@ const ClientUserSchema = new Schema({
         type: String,
         unique: true
     },
-    acount_payment: { 
+    acount_payment: {
         balance: { // tai khoan
             type: Number,
             default: 0,
             min: 0
         },
         history_recharge: [],
-        history_transaction: {
-            type: Schema.Types.ObjectId,
-            ref: 'tickets'
-        }
+        history_transaction: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'tickets'
+            }
+        ]
 
 
     },

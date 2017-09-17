@@ -1,5 +1,6 @@
 import HTTPStatus from 'http-status';
 import Client from '../../../models/client.model';
+import Ticket from '../../../models/ticket.model.js';
 
 
 
@@ -71,4 +72,16 @@ export async function _putRechairCoin(req, res) {
     } catch (err) {
         return res.status(HTTPStatus.BAD_REQUEST).json({ err: true, message: "Phat sinh loi tu hanh dong cua ban" });
     }
+}
+export async function _getAllTicketOfClient(req, res) {
+    try {
+        const kq = await Client.findById(req.body.id).populate({
+            path: "acount_payment.history_transaction",
+            model: "tickets"
+        });
+        return res.status(HTTPStatus.OK).json({ err: false, result: kq });
+    } catch (err) {
+        return res.status(HTTPStatus.BAD_REQUEST).json({ err: true, message: "Phat sinh loi tu yeu cau cua bạn" });
+    }
+
 }
