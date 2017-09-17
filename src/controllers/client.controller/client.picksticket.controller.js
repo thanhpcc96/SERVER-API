@@ -43,7 +43,9 @@ export function _getCouponInfo(req, res, next) {
 }
 
 export function _putPickTicket(req, res, next){
-    
+        
+        
+
 }
 
 
