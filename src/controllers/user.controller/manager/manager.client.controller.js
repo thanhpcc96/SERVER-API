@@ -1,6 +1,5 @@
 import HTTPStatus from 'http-status';
 import Client from '../../../models/client.model';
-import Ticket from '../../../models/ticket.model.js';
 
 
 
@@ -73,6 +72,11 @@ export async function _putRechairCoin(req, res) {
         return res.status(HTTPStatus.BAD_REQUEST).json({ err: true, message: "Phat sinh loi tu hanh dong cua ban" });
     }
 }
+/**
+ * Hàm lấy ra những danh sách những vé mà 1 khách hàng đã đặt
+ * @param {Object} req 
+ * @param {Object} res 
+ */
 export async function _getAllTicketOfClient(req, res) {
     try {
         const kq = await Client.findById(req.body.id).populate({
