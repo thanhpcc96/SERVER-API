@@ -21,5 +21,4 @@ export async function _getAllUser(req, res) {
     } catch (err) {
         return res.status(HTTPStatus.BAD_REQUEST).json({ err: true, message: "Loi tu yeu cau cua ban" });
     }
-
 }
