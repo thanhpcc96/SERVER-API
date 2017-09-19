@@ -22,3 +22,15 @@ export async function _getAllUser(req, res) {
         return res.status(HTTPStatus.BAD_REQUEST).json({ err: true, message: "Loi tu yeu cau cua ban" });
     }
 }
+
+export async function _deleteUser(req, res) {
+    try {
+        const user = req.user;
+        if (user.role !== 1 || user.role !== 2) {
+            return res.status(HTTPStatus.FORBIDDEN).json({ err: true, message: " Ban khong co quyen thuc hien hanh dong nay" })
+        }
+
+    } catch (err) {
+        return res.status(HTTPStatus.BAD_REQUEST).json({ err: true, message: " Phat sinh loi tu hanh dong cua ban" });
+    }
+}
