@@ -8,6 +8,7 @@ import chalk from 'chalk';
 import os from 'os';
 import cluster from 'cluster';
 import kue from 'kue';
+import path from 'path';
 
 import './config/database'; // config database
 import middlewareConfig from './config/middleware';
@@ -24,6 +25,9 @@ const app = express();
 
 //thiet lap middleware cho ung dung
 middlewareConfig(app);
+
+//thiey lap static path
+app.use(express.static(path.join(__dirname, "public")));
 
 // thiet lap router cho ung dung
 app.use('/api/v1', ApiRoutes);
