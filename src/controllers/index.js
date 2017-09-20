@@ -1,5 +1,6 @@
 import usercontroller from './user.controller';
 
-export default controller={
+const controllerRoot={
     usercontroller,
 }
+export default controllerRoot;
