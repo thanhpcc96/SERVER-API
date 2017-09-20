@@ -64,8 +64,8 @@ export async function _postCreateUser(req, res) {
                 photoProfile: [],
 
             },
-            role: req.body.role > 2 ? req.body.role : 3
-
+            role: req.body.role > 2 ? req.body.role : 3,
+            status: 'ACTIVE'
         }
         if (req.file) {
             req.file.forEach(file => {
