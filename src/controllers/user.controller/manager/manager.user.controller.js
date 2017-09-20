@@ -44,7 +44,11 @@ export async function _deleteUser(req, res) {
         return res.status(HTTPStatus.BAD_REQUEST).json({ err: true, message: " Phat sinh loi tu hanh dong cua ban" });
     }
 }
-
+/**
+ * HÀM tạo 1 user mới có sử dụng upload file
+ * @param {Object} req 
+ * @param {Object} res 
+ */
 export async function _postCreateUser(req, res) {
     try {
         const user = req.user;
