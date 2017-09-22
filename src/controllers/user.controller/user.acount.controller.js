@@ -11,6 +11,20 @@ export function _postLogin(req, res, next) {
     next();
 }
 /**
+ * Ham get du lieu ve cua 1 user ve
+ * @param {*} req 
+ * @param {*} res 
+ */
+export async function _getUserInfo(req, res) {
+    try {
+        return res.status(HTTPStatus.OK).json({ err: fasle, result: await UserModel.findById(req.user._id) });
+    } catch (err) {
+        return res.status(HTTPStatus.BAD_REQUEST).json({err: true, message: "Loi phat sinh"});
+    }
+}
+
+
+/**
  * Ham update thong tin user
  * @param {Object} req 
  * @param {Object} res 
