@@ -1,7 +1,6 @@
-import kue from 'kue'; // config worker
+/*import kue from 'kue'; // config worker */
 import crypto from 'crypto';
 import Client from '../../models/client.model';
-import { tranporter } from '../config/mailer';
 
 /*
  ** Post Register Local
@@ -42,8 +41,8 @@ export function _postLogin(req, res, next) {
 */
 export async function _postResetPassword(req, res) {
     try {
-        // }
-        let jobs = kue.createQueue();
+        
+        // let jobs = kue.createQueue();
         const client = await Client.findOne({ 'local.email': req.body.email });
         if (!client) {
             return res.status(404).json({ error: true, message: 'Tài khoản không tồn tại' });
@@ -51,33 +50,33 @@ export async function _postResetPassword(req, res) {
         console.log('=====================================');
         console.log(client);
         console.log('=====================================');
-        let resetPasswordToken = crypto.randomBytes(16).toString('hex');
-        client.local.resetPasswordToken = resetPasswordToken;
-        client.local.resetPasswordExpires = Date.now() + 18000000; //60*60*1000 *5/ 5 tieng
-        let mailOption = {
-            from: 'Hai Au copany <services.haiaucompany@gmail.com>',
-            to: req.body.email,
-            subject: 'Khôi phục mật khẩu',
-            text: ` Xin chào ${client.info.lastname}, vui lòng nhấp vào link để đặt lại mặt khẩu của bạn:
-                        http://localhost:3000/client/forgot/${resetPasswordToken}`
-        }
+        // let resetPasswordToken = crypto.randomBytes(16).toString('hex');
+        // client.local.resetPasswordToken = resetPasswordToken;
+        // client.local.resetPasswordExpires = Date.now() + 18000000; //60*60*1000 *5/ 5 tieng
+        // let mailOption = {
+        //     from: 'Hai Au copany <services.haiaucompany@gmail.com>',
+        //     to: req.body.email,
+        //     subject: 'Khôi phục mật khẩu',
+        //     text: ` Xin chào ${client.info.lastname}, vui lòng nhấp vào link để đặt lại mặt khẩu của bạn:
+        //                 http://localhost:3000/client/forgot/${resetPasswordToken}`
+        // }
         //const promise = await Promise.all([
-        client.save();//,
-        //tranporter.sendMail(mailOption)
-        //])
-        let job = jobs.create('sendMail', {
-            optionMail: mailOption
-        }).priority('high');
-        job.on('failed',()=>{
-            console.log(`email loi me roi!`);
-        }).on('complete', () => {
-            console.log("job completed");
-        }).on("progress", () => {
-            console.log("job completed");
-        });
-        job.save(err => {
-            if (!err) console.log(`id cong viec cua ban la ${job.id}`);
-        });
+        // client.save();//,
+        // //tranporter.sendMail(mailOption)
+        // //])
+        // let job = jobs.create('sendMail', {
+        //     optionMail: mailOption
+        // }).priority('high');
+        // job.on('failed',()=>{
+        //     console.log(`email loi me roi!`);
+        // }).on('complete', () => {
+        //     console.log("job completed");
+        // }).on("progress", () => {
+        //     console.log("job completed");
+        // });
+        // job.save(err => {
+        //     if (!err) console.log(`id cong viec cua ban la ${job.id}`);
+        // });
         return res.status(200).json({ error: false, message: "Vui lòng check mail" });
 
 
@@ -90,32 +89,33 @@ export async function _postResetPassword(req, res) {
 /*
 * Post reset password khi co token
  */
-export async function _resetPassword(req, res) {
-    try {
-        let token = req.params.token;
-        const client = await Client.findOne({ "local.resetPasswordToken": token.trim() });
-        if (!client) {
-            return res.status(404).json({ error: true, message: "Mã xác nhận không hợp lệ" });
-        }
-        if (client.local.resetPasswordExpires < new Date()) {
-            return res.status(400).json({
-                error: true,
-                message: 'Mã xác nhận đã hết hạn từ ' + client.local.resetPasswordExpires
-            });
-        } else {
-            client.local.password = req.body.password;
-            return res.status(200).json({ error: false, result: await client.save() })
-        }
-    } catch (error) {
-        console.log('=====================================');
-        console.log("Lỗi ở forgot", error);
-        console.log('=====================================');
-    }
-}
-/*
+// export async function _resetPassword(req, res) {
+//     try {
+//         let token = req.params.token;
+//         const client = await Client.findOne({ "local.resetPasswordToken": token.trim() });
+//         if (!client) {
+//             return res.status(404).json({ error: true, message: "Mã xác nhận không hợp lệ" });
+//         }
+//         if (client.local.resetPasswordExpires < new Date()) {
+//             return res.status(400).json({
+//                 error: true,
+//                 message: 'Mã xác nhận đã hết hạn từ ' + client.local.resetPasswordExpires
+//             });
+//         } else {
+//             client.local.password = req.body.password;
+//             return res.status(200).json({ error: false, result: await client.save() })
+//         }
+//     } catch (error) {
+//         console.log('=====================================');
+//         console.log("Lỗi ở forgot", error);
+//         console.log('=====================================');
+//     }
+// }
+
+/** 
 * POST Update thong tin ca nhan
 */
-export async function _updateInfo(req, res, next) {
+export async function _updateInfo(req, res) {
     try {
         if (!req.client._id) {
             return res.status(400).json({ error: true, message: "Ban khong co quyen" })
@@ -128,7 +128,7 @@ export async function _updateInfo(req, res, next) {
         client.info.lastname = client.info.lastname || req.body.lastname;
         client.info.address = client.info.address || req.body.address;
         if (!req.body.email && req.body.email !== client.local.email) {
-            let clientCheck = await Client.findOne({ 'local.email': req.body.email });
+            const clientCheck = await Client.findOne({ 'local.email': req.body.email });
             if (clientCheck) return res.status(301).json({ error: true, message: "Email ton tai roi khong the them moi" })
         }
         client.local.email = client.local.email || req.body.email;

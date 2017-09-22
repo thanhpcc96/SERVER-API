@@ -30,22 +30,30 @@ export async function _getAllAvaiableChuyen(req, res) { // lấy danh sách chuy
  * client Reactjs và RN- Được viết bởi PHẠM THÀNH
  * Hàm này bắn vào router sau thằng middleware chứng thực :))
  * @param {Object} req - đối tượng request
- * @param {Object} res - đối tượng response trả về client
- * @param {function} next - hàm callback để gọi middware khác
- * @return {function} next() - để thằng middle sau nó được thực thi
+ * @param {Object} res - đối tượng response trả về client 
  */
-export function _getCouponInfo(req, res, next) {
-    Coupon.findOne({ code: req.params.code }, (err, coupon) => {
-        if (err) { return next(err) }
-        res.status(HTTPStatus.OK).json({ err: false, result: coupon });
-        return next();
-    });
+export async function _getCouponInfo(req, res) {
+    try {
+        return res.status(HTTPStatus.OK).json({ err: false, result: await Ticket.findOne({ code: req.body.code }) });
+    } catch (err) {
+        return res.status(HTTPStatus.BAD_REQUEST).json({ err: true, message: "Loi tu hanh dong cua ban" });
+    }
 }
 
-export function _putPickTicket(req, res, next){
-        
-        
+export function _putPickTicket(req, res, next) {
 
+
+
+}
+
+
+export async function _putCancelTicket(req, res){
+    try {
+        const ticketWasPick= await Ticket.findById(req.body.idTicket);
+        
+    } catch (err) {
+        return res.status(HTTPStatus.BAD_REQUEST).json({err: true, message: "Phat sinh loi voi hanh dong cua ban"});
+    }
 }
 
 
