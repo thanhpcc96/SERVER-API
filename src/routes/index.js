@@ -9,9 +9,7 @@ import logErrorService from '../services/log';
 
 const routes = new Router();
 
-routes.get("/a", (req, res) => {
-    res.status(200).json("jfnfkkm")
-});
+
 routes.all('*', (req, res, next) => {
     next(new APIError('Not Found!', HTTPStatus.NOT_FOUND, true));
 });
