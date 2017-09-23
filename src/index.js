@@ -8,6 +8,7 @@ import chalk from 'chalk';
 import os from 'os';
 import path from 'path';
 import Agendash from 'agendash';
+//import Agenda from 'agenda';
 
 import './config/database'; // config database
 import middlewareConfig from './config/middleware';
@@ -19,9 +20,14 @@ import agenda from './jobLoader';
 
 
 
+
 import io from './io';
 
 const app = express();
+
+//const agenda = new Agenda({ db: { address: constants.MONGO_URL } });
+
+
 
 //thiet lap middleware cho ung dung
 middlewareConfig(app);

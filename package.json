@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "agenda": "^1.0.0",
-    "agendash": "^0.4.0",
+    "agendash": "https://github.com/thanhpcc96/agendash.git",
     "babel-cli": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
     "bcrypt-nodejs": "^0.0.3",
