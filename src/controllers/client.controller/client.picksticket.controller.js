@@ -46,13 +46,18 @@ export function _putPickTicket(req, res, next) {
 
 }
 
-
-export async function _putCancelTicket(req, res){
+/**
+ * Ham xu ly cho khach hang huy ve
+ * @param {req} req 
+ * @param {res} res 
+ */
+export async function _putCancelTicket(req, res) {
     try {
-        const ticketWasPick= await Ticket.findById(req.body.idTicket);
-        
+        const ticketWasPick = await Ticket.findById(req.body.idTicket);
+        ticketWasPick.isAvaiable = true;
+        return res.status(HTTPStatus.OK).json({ err: false, result: await ticketWasPick.save() });
     } catch (err) {
-        return res.status(HTTPStatus.BAD_REQUEST).json({err: true, message: "Phat sinh loi voi hanh dong cua ban"});
+        return res.status(HTTPStatus.BAD_REQUEST).json({ err: true, message: "Phat sinh loi voi hanh dong cua ban" });
     }
 }
 
