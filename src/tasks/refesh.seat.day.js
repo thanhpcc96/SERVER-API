@@ -2,6 +2,7 @@
 ** tu dong refesh lai so cho ngoi, chuyen theo ngay
 */
 import tripModel from '../models/trips.model';
+import phancongModel from '../models/phancong.model'
 
 
 export default function refeshSeat(agenda){

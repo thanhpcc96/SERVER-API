@@ -1,35 +1,37 @@
 import mongoose, { Schema } from 'mongoose';
 
 const chuyen = new Schema({
-    sochuyen:{
+    sochuyen: {
         type: String,
         unique: true,
     },
-    inTrip:{
+    inTrip: {
         type: Schema.Types.ObjectId,
-        ref:'trips'
+        ref: 'trips'
     },
-    laixevaphuxe:{
-        type: Schema.type.ObjectId,
-        ref:'users'
-    },
-    coach:{
+    laixevaphuxe: [
+        {
+            type: Schema.type.ObjectId,
+            ref: 'users'
+        }
+    ],
+    coach: {
         type: Schema.Types.ObjectId,
         ref: 'coachs'
     },
-    ticketsInChuyen:[
+    ticketsInChuyen: [
         {
             type: Schema.Types.ObjectId,
             ref: 'tickets'
         }
     ],
-    choNgoi:{
-        type:Number,
-        min:0
+    choNgoi: {
+        type: Number,
+        min: 0
     },
-    tinhtrang:[
+    tinhtrang: [
 
     ]
 }, { timestamps: true });
 
-export default mongoose.model('chuyen',chuyen);
+export default mongoose.model('chuyen', chuyen);

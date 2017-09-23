@@ -20,6 +20,10 @@ const Trip = new Schema({
         to: {
             type: String,
             required: [true, 'Diem den cung phai bat buoc']
+        },
+        lotrinh:{
+            type: String,
+            require:[true,"Lotrinh xe la bat buoc"]
         }
     },
     chuyenTrongTuyen: [{ // nhung chuyen xe se chay tren tuyen duong nay
