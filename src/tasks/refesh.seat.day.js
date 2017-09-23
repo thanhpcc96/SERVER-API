@@ -1,13 +1,14 @@
 /*
 ** tu dong refesh lai so cho ngoi, chuyen theo ngay
 */
-import shedule from 'node-schedule';
-import kue from 'kue';
-import Agenda from 'agenda';
-import constants from '../config/constants';
+import tripModel from '../models/trips.model';
 
-const agenda= new Agenda();
-agenda.database(constants.MONGO_URL);
-agenda.define('refesh')
 
-export
+export default function refeshSeat(agenda){
+    agenda.define("refeshseat",(job, done)=>{
+        let time= Date.now();
+        for(let i=0; i<6; i++){
+            
+        }
+    });
+}
