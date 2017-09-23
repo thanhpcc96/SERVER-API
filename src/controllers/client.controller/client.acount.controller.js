@@ -1,5 +1,5 @@
-import kue from 'kue'; // config worker */
 import crypto from 'crypto';
+import agenda from '../../tasks/send.mail.task'; // config worker */
 import Client from '../../models/client.model';
 
 /*
@@ -42,7 +42,6 @@ export function _postLogin(req, res, next) {
 export async function _postResetPassword(req, res) {
     try {
         
-        const jobs = kue.createQueue();
         const client = await Client.findOne({ 'local.email': req.body.email });
         if (!client) {
             return res.status(404).json({ error: true, message: 'Tài khoản không tồn tại' });
@@ -60,9 +59,7 @@ export async function _postResetPassword(req, res) {
             text: ` Xin chào ${client.info.lastname}, vui lòng nhấp vào link để đặt lại mặt khẩu của bạn:
                         http://localhost:3000/client/forgot/${resetPasswordToken}`
         }
-        const job = jobs.create('sendMail', {
-            optionMail: mailOption
-        }).priority('high');
+        
         // job.on('failed',()=>{
         //     console.log(`email loi me roi!`);
         // }).on('complete', () => {
