@@ -1,5 +1,5 @@
 import HTTPStatus from 'http-status';
-import Client from '../../models/client.model';
+
 import Ticket from '../../models/ticket.model';
 import Chuyen from '../../models/chuyenxe.model.js';
 import Coupon from '../../models/coupons.model';
@@ -34,7 +34,7 @@ export async function _getAllAvaiableChuyen(req, res) { // lấy danh sách chuy
  */
 export async function _getCouponInfo(req, res) {
     try {
-        return res.status(HTTPStatus.OK).json({ err: false, result: await Ticket.findOne({ code: req.body.code }) });
+        return res.status(HTTPStatus.OK).json({ err: false, result: await Coupon.findOne({ code: req.body.code }) });
     } catch (err) {
         return res.status(HTTPStatus.BAD_REQUEST).json({ err: true, message: "Loi tu hanh dong cua ban" });
     }

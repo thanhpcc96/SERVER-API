@@ -13,18 +13,18 @@ const WHITELIST = {
 const devConfig = {
     JWT_SECRET: process.env.JWT_SECRET_DEV,
     MONGO_URL: process.env.MONGO_URL_DEV,
-    REDIS_URL: process.env.REDIS_URI_
+    REDIS_URL: process.env.REDIS_URI_DEV
 };
 const testConfig = {
     JWT_SECRET: process.env.JWT_SECRET_TEST,
     MONGO_URL: process.env.MONGO_URL_TEST,
-    REDIS_URL: process.env.REDIS_URI_
+    REDIS_URL: process.env.REDIS_URI_TEST
 };
 
 const prodConfig = {
     JWT_SECRET: process.env.JWT_SECRET_PROD,
     MONGO_URL: process.env.MONGO_URL_PROD,
-    REDIS_URL: process.env.REDIS_URI_
+    REDIS_URL: process.env.REDIS_URI_PROD
 }
 const defaultConfig = {
     PORT: process.env.PORT || 3000,

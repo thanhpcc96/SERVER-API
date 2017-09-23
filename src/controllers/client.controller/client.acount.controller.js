@@ -1,4 +1,4 @@
-/*import kue from 'kue'; // config worker */
+import kue from 'kue'; // config worker */
 import crypto from 'crypto';
 import Client from '../../models/client.model';
 
@@ -19,7 +19,7 @@ export async function _postRegister(req, res) {
             newClient.phone = req.body.phone;
             newClient.local.email = req.body.email;
             newClient.local.password = req.body.password;
-            newClient.status = "DEACTIVE"; // chưa kích hoạt
+            newClient.status = "ACTIVE"; // chưa kích hoạt
             return res.status(200).json({ error: false, result: await newClient.save() });
         
 
@@ -42,7 +42,7 @@ export function _postLogin(req, res, next) {
 export async function _postResetPassword(req, res) {
     try {
         
-        // let jobs = kue.createQueue();
+        const jobs = kue.createQueue();
         const client = await Client.findOne({ 'local.email': req.body.email });
         if (!client) {
             return res.status(404).json({ error: true, message: 'Tài khoản không tồn tại' });
@@ -50,23 +50,19 @@ export async function _postResetPassword(req, res) {
         console.log('=====================================');
         console.log(client);
         console.log('=====================================');
-        // let resetPasswordToken = crypto.randomBytes(16).toString('hex');
-        // client.local.resetPasswordToken = resetPasswordToken;
-        // client.local.resetPasswordExpires = Date.now() + 18000000; //60*60*1000 *5/ 5 tieng
-        // let mailOption = {
-        //     from: 'Hai Au copany <services.haiaucompany@gmail.com>',
-        //     to: req.body.email,
-        //     subject: 'Khôi phục mật khẩu',
-        //     text: ` Xin chào ${client.info.lastname}, vui lòng nhấp vào link để đặt lại mặt khẩu của bạn:
-        //                 http://localhost:3000/client/forgot/${resetPasswordToken}`
-        // }
-        //const promise = await Promise.all([
-        // client.save();//,
-        // //tranporter.sendMail(mailOption)
-        // //])
-        // let job = jobs.create('sendMail', {
-        //     optionMail: mailOption
-        // }).priority('high');
+        const resetPasswordToken = crypto.randomBytes(16).toString('hex');
+        client.local.resetPasswordToken = resetPasswordToken;
+        client.local.resetPasswordExpires = Date.now() + 18000000; //60*60*1000 *5/ 5 tieng
+        const mailOption = {
+            from: 'Hai Au copany <services.haiaucompany@gmail.com>',
+            to: req.body.email,
+            subject: 'Khôi phục mật khẩu',
+            text: ` Xin chào ${client.info.lastname}, vui lòng nhấp vào link để đặt lại mặt khẩu của bạn:
+                        http://localhost:3000/client/forgot/${resetPasswordToken}`
+        }
+        const job = jobs.create('sendMail', {
+            optionMail: mailOption
+        }).priority('high');
         // job.on('failed',()=>{
         //     console.log(`email loi me roi!`);
         // }).on('complete', () => {
