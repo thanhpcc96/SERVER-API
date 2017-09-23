@@ -9,7 +9,6 @@ import logErrorService from '../services/log';
 
 const routes = new Router();
 
-
 routes.all('*', (req, res, next) => {
     next(new APIError('Not Found!', HTTPStatus.NOT_FOUND, true));
 });

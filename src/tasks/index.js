@@ -1,8 +1,6 @@
 import sendmail from './send.mail.task';
 
-const task={
-    sendmail
-}
-export {
+
+export default {
     sendmail
 }

@@ -1,5 +1,6 @@
 import crypto from 'crypto';
-import agenda from '../../tasks/send.mail.task'; // config worker */
+
+import agenda from '../../jobLoader'; // config worker */
 import Client from '../../models/client.model';
 
 /*
@@ -59,17 +60,8 @@ export async function _postResetPassword(req, res) {
             text: ` Xin chào ${client.info.lastname}, vui lòng nhấp vào link để đặt lại mặt khẩu của bạn:
                         http://localhost:3000/client/forgot/${resetPasswordToken}`
         }
+        agenda.now('sendmail',mailOption);
         
-        // job.on('failed',()=>{
-        //     console.log(`email loi me roi!`);
-        // }).on('complete', () => {
-        //     console.log("job completed");
-        // }).on("progress", () => {
-        //     console.log("job completed");
-        // });
-        // job.save(err => {
-        //     if (!err) console.log(`id cong viec cua ban la ${job.id}`);
-        // });
         return res.status(200).json({ error: false, message: "Vui lòng check mail" });
 
 

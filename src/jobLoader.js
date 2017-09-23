@@ -1,19 +1,15 @@
 import Agenda from 'agenda';
 import constants from './config/constants';
-import sendmail from './tasks/index';
+import sendmail from './tasks/send.mail.task';
 
-const agenda = new Agenda();
-agenda.database({
-    db: {
-        address: constants.MONGO_URL,
-        collection: 'agendaJob'
-    }
-});
-const listJobs = process.env.JOBS_TYPE ? process.env.JOBS_TYPE.split(',') : [];
+const agenda = new Agenda({ db: { address: 'mongodb://127.0.0.1/DOAN-Thanh-dev' } });
+// agenda.database({
+//     db: {
+//         address: 'mongodb://127.0.0.1/DOAN-Thanh-dev', //constants.MONGO_URL,
+//         collection: 'agendaJob'
+//     }
+// });
+sendmail(agenda);
 
-listJobs.forEach(type > {
-    import  from './tasks';
-})
-sendmail(an)
 
 export default agenda;

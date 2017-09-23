@@ -6,14 +6,14 @@ import express from 'express'; /* eslint-disable */
 import http from 'http';
 import chalk from 'chalk';
 import os from 'os';
-import cluster from 'cluster';
-import kue from 'kue';
 import path from 'path';
+import Agendash from 'agendash';
 
 import './config/database'; // config database
 import middlewareConfig from './config/middleware';
 import constants from './config/constants';
 import ApiRoutes from './routes';
+import agenda from './jobLoader';
 
 
 
@@ -25,7 +25,7 @@ const app = express();
 
 //thiet lap middleware cho ung dung
 middlewareConfig(app);
-
+app.use("/jobs", Agendash(agenda));
 //thiey lap static path
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -39,25 +39,25 @@ app.use('/api/v1', ApiRoutes);
 
 const server = http.createServer(app);
 io.attach(server);
-const jobs = kue.createQueue();
 
-if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === "test") {
-    const cpuLenght = os.cpus().length;
-    if (cluster.isMaster) {
-        app.use(kue.app);
-        for (let i = 0; i < cpuLenght; i++) {
-            const worker = cluster.fork();
-        }
-        console.log('============================================');
-        console.log('========== Dang trong master     ===========');
-        console.log('============================================');
-    } else {
-        // thực hiện background job trong cac fork từ cpu ra
-        console.log('============================================');
-        console.log('========== Dang trong worker     ===========');
-        console.log('============================================');
-    }
-}
+
+// if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === "test") {
+//     const cpuLenght = os.cpus().length;
+//     if (cluster.isMaster) {
+//         app.use();
+//         for (let i = 0; i < cpuLenght; i++) {
+//             const worker = cluster.fork();
+//         }
+//         console.log('============================================');
+//         console.log('========== Dang trong master     ===========');
+//         console.log('============================================');
+//     } else {
+//         // thực hiện background job trong cac fork từ cpu ra
+//         console.log('============================================');
+//         console.log('========== Dang trong worker     ===========');
+//         console.log('============================================');
+//     }
+// }
 // kiem tra neu co 1 instance roi thi khong chay
 if (!module.parent) {
     server.listen(constants.PORT, err => {
