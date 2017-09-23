@@ -22,8 +22,6 @@ const ClientUserSchema = new Schema({
                 ref: 'tickets'
             }
         ]
-
-
     },
     info: {
         firstname: {

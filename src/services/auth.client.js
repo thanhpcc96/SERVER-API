@@ -8,22 +8,22 @@ import constants from '../config/constants';
 /*
 *Xac thuc local
 */
-const localOpt = { usernameField: 'phone' };
+const localOpt = { usernameField: 'email' };
 const localLogin = new LocalStrategy(
     localOpt,
-    async (phone, password, done) => {
+    async (email, password, done) => {
         try {
-            const client = await Client.findOne({ phone });
+            const client = await Client.findOne({ "local.email": email });
             if (!client) {
                 return done(null, false);
-            } else if (!client.authenticateUser(password)) {
+            } else if (!client.authenticateClientUser(password)) {
                 return done(null, false);
             }
             return done(null, client);
         } catch (err) {
             return done(err, false);
         }
-    }
+    },
 );
 /*
 * JWT Strategy Auth
@@ -50,5 +50,5 @@ const jwtLogin = new JWTStrategy(jwtOpt, async (payload, done) => {
 passport.use(localLogin);
 passport.use(jwtLogin);
 
-export const authLocal = passport.authenticate('clientlocal', { session: false });
-export const authJwt = passport.authenticate('clientjwt', { session: false });
+export const authLocal = passport.authenticate('local', { session: false });
+export const authJwt = passport.authenticate('jwt', { session: false });

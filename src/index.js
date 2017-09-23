@@ -25,6 +25,9 @@ const app = express();
 
 //thiet lap middleware cho ung dung
 middlewareConfig(app);
+
+
+
 app.use("/jobs", Agendash(agenda));
 //thiey lap static path
 app.use(express.static(path.join(__dirname, "public")));
