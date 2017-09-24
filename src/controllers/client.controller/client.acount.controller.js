@@ -7,22 +7,32 @@ import Client from '../../models/client.model';
  ** Post Register Local
  */
 /* eslint-disable-no-else-return */
+
+export async function _getAll(req, res) {
+    try {
+        const list = await Client.find();
+        console.log(list);
+        return res.status(200).json({ err: false ,result: list })
+    } catch (err) {
+        return res.status(503).json({ err: true, message: " Loi" })
+    }
+}
 export async function _postRegister(req, res) {
     try {
         const client = await Client.findOne({ "local.email": req.body.email });
         if (client) {
             return res.status(401).json({ error: true, message: 'Tai khoan nay da ton tai' })
         }
-       
-            const newClient = new Client();
-            newClient.info.firstname = req.body.firstname;
-            newClient.info.lastname = req.body.lastname;
-            newClient.phone = req.body.phone;
-            newClient.local.email = req.body.email;
-            newClient.local.password = req.body.password;
-            newClient.status = "ACTIVE"; // chưa kích hoạt
-            return res.status(200).json({ error: false, result: await newClient.save() });
-        
+
+        const newClient = new Client();
+        newClient.info.firstname = req.body.firstname;
+        newClient.info.lastname = req.body.lastname;
+        newClient.phone = req.body.phone;
+        newClient.local.email = req.body.email;
+        newClient.local.password = req.body.password;
+        newClient.status = "ACTIVE"; // chưa kích hoạt
+        return res.status(200).json({ error: false, result: await newClient.save() });
+
 
     } catch (err) {
         console.log("Loi dang ky: " + err);
@@ -42,7 +52,7 @@ export function _postLogin(req, res, next) {
 */
 export async function _postResetPassword(req, res) {
     try {
-        
+
         const client = await Client.findOne({ 'local.email': req.body.email });
         if (!client) {
             return res.status(404).json({ error: true, message: 'Tài khoản không tồn tại' });
@@ -60,8 +70,8 @@ export async function _postResetPassword(req, res) {
             text: ` Xin chào ${client.info.lastname}, vui lòng nhấp vào link để đặt lại mặt khẩu của bạn:
                         http://localhost:3000/client/forgot/${resetPasswordToken}`
         }
-        agenda.now('sendmail',mailOption);
-        
+        agenda.now('sendmail', mailOption);
+
         return res.status(200).json({ error: false, message: "Vui lòng check mail" });
 
 

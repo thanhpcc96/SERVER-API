@@ -54,6 +54,7 @@
     "kue": "^0.11.6",
     "lodash": "^4.17.4",
     "method-override": "^2.3.9",
+    "moment": "^2.18.1",
     "mongoose": "^4.11.11",
     "mongoose-unique-validator": "^1.0.5",
     "morgan": "^1.8.2",

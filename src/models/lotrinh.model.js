@@ -15,9 +15,17 @@ const LotrinhSchema = new Schema({
             require: [true, "Lotrinh xe la bat buoc"]
         }
     },
-    vitriChotKT:[
+    vitriChotKT: [
         {
             type: String // địa phận , vị trí của chốt kiểm tra
         }
+    ],
+    xetronglotrinh:[
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'coachs'
+        }
     ]
 }, { timestamps: true });
+
+export default mongoose.model('lotrinh', LotrinhSchema);

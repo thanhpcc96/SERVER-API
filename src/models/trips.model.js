@@ -13,18 +13,8 @@ const Trip = new Schema({
         required: [true, 'Thoi gian du kien ket thuc la bat buoc']
     },
     routeOfTrip: { // lộ trình của chuyến, Ví dụ: Hà nội ---> Hải Phòng
-        from: {
-            type: String,
-            required: [true, 'Diem xuat phat la bat buoc']
-        },
-        to: {
-            type: String,
-            required: [true, 'Diem den cung phai bat buoc']
-        },
-        lotrinh:{
-            type: String,
-            require:[true,"Lotrinh xe la bat buoc"]
-        }
+        type: Schema.Types.ObjectId,
+        ref: 'lotrinh'
     },
     chuyenTrongTuyen: [{ // nhung chuyen xe se chay tren tuyen duong nay
         type: Schema.Types.ObjectId,
@@ -33,7 +23,11 @@ const Trip = new Schema({
     thanhtrakiemtra: [{ // có thanh tra kiểm tra theo từng chặng đường
         type: Schema.Types.ObjectId,
         ref: 'users'
-    }]
+    }],
+    loai:{
+        type: String, // di ve ve
+        default: "DI"
+    }
 
 }, { timestamps: true });
 

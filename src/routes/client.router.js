@@ -11,6 +11,8 @@ route.post('/login', authLocal, ClientController._postLogin);
 
 route.post('/forgot',ClientController._postResetPassword); //_resetPassword
 
+route.get("/all", ClientController._getAll);
+
 //route.post('/reset/:token',ClientController._resetPassword);
 
 export default route;
