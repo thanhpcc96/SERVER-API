@@ -15,12 +15,17 @@ const LotrinhSchema = new Schema({
             require: [true, "Lotrinh xe la bat buoc"]
         }
     },
+    thoigianvanchuyen: {
+        type: Number,
+        default: 1,
+        min: 0
+    },
     vitriChotKT: [
         {
             type: String // địa phận , vị trí của chốt kiểm tra
         }
     ],
-    xetronglotrinh:[
+    xetronglotrinh: [
         {
             type: Schema.Types.ObjectId,
             ref: 'coachs'
