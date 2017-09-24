@@ -23,7 +23,7 @@ const chuyen = new Schema({
     }],
     laixevaphuxe: [
         {
-            type: Schema.type.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: 'users'
         }
     ],

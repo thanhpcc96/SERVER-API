@@ -12,7 +12,7 @@ import lotrinhModel from '../models/lotrinh.model'
 
 export default function refeshSeat(agenda) {
     agenda.define("refeshseat", (job, done) => {
-
+            phancong(done);
     });
 };
 //config chuyen xe cứng
@@ -60,4 +60,5 @@ const phancong = async (done) => {
         }
     }
     const listChuyen = await chuyenxeModel.insertMany(chuyenArr);
+    return done();
 }
