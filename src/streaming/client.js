@@ -6,6 +6,9 @@ import ChuyenxeModel from '../models/chuyenxe.model';
 
 const client = redis.createClient();
 const expire = 7200;
+
+
+
 /**
  * Hàm xử lý load thông tin danh sách chuyến xe để 
  * client đăng ký theo thời gian 
@@ -61,13 +64,37 @@ export function _get1Chuyenxe(keyChuyen) {
     });
 }
 
-export function _pickChuyen(userID, chuyenID, chongoi,thongtinticket) {
+export async function _pickChuyen(userID, chuyenID, chongoi, thongtinticket) {
+try {
+    const arrPromise= Promise.all(await ) 
+} catch (err) {
+    return err;
+}
+
+
+
+
+
+
+
+
     return new Promise((resolve, reject) => {
         const maTicket = chuyenID + crypto.randomBytes(2).toString('hex');
         client.multi()
             .hmset('chuyenxe:' + chuyenID, { 'choNgoi': chongoi })
-            .sadd('ticket', maTicket)
-            .hmset('ticket'+maTicket,{
+            .exec(err => {
+                if (err) {
+                    reject(err);
+                } else {
+
+                }
+            })
+
+    })
+}
+/**
+ * .sadd('ticket', maTicket)
+            .hmset('ticket:' + maTicket, {
                 codeTicket: maTicket,
                 price: thongtinticket.price.toString(),
                 dateOfStart: thongtinticket.dateOfStart.toString(),
@@ -75,9 +102,9 @@ export function _pickChuyen(userID, chuyenID, chongoi,thongtinticket) {
                 inChuyenXe: chuyenID,
                 Customer: userID,
                 coupon: thongtinticket.coupon || '',
-                
+                isAvaiable: thongtinticket.isAvaiable || 'false',
+                isPay: 'false'
             })
             .sadd('chuyenxe:' + chuyenID + ':ve', maTicket)
             .sadd()
-    })
-}
+ */

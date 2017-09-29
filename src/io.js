@@ -1,6 +1,7 @@
 /*eslint-disable */
 import socketIO from 'socket.io';
 
+
 const io = socketIO();
 let countClient = 0;
 
@@ -13,6 +14,10 @@ io.on('connection', socket => {
 });
 
 const clients = io.of('/client').on('connection', socket => {
+    socket.use((socket, next) => {
+        const token = socket.request.query.token;
+        
+    })
 
     function serverError(err, message) {
         console.log(err);
@@ -20,7 +25,7 @@ const clients = io.of('/client').on('connection', socket => {
     }
 
     socket.on('loadChuyenxe', token => {
-        
+
     })
 })
 

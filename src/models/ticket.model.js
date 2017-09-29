@@ -46,11 +46,12 @@ const TicketSchema = new Schema({
 
 
 TicketSchema.pre('save', function (next) {
-    if (this.isModified('isAvaiable')) {
-        if (this.isAvaiable === true) {
-            this._removeTicketFromChuyenXe();
+    if ()
+        if (this.isModified('isAvaiable')) {
+            if (this.isAvaiable === true) {
+                this._removeTicketFromChuyenXe();
+            }
         }
-    }
     return next();
 });
 
@@ -59,13 +60,23 @@ TicketSchema.methods = {
     /**
      *  Ham xu ly hanh dong khach hang huy chuyen xe
      */
-    async _removeTicketFromChuyenXe() {
-        const chuyenxe = await ChuyenxeModel.findById(this.inChuyenXe);
-        if (!chuyenxe) return;
-        if (chuyenxe.ticketsInChuyen.indexOf(this._id)) {
-            chuyenxe.ticketsInChuyen.remove(this._id);
-        }
+    _removeTicketFromChuyenXe() {
+        ChuyenxeModel.findById(this.inChuyenXe, (err, result) => {
+            if (err) {
+                return;
+            }
+            if (result.ticketsInChuyen.indexOf(this._id)) {
+                result.ticketsInChuyen.remove(this._id);
+                result.save(err => {
+                    if (err) { return; }
+                })
+            }
+        });
     }
+}
+
+TicketSchema.static={
+    create 
 }
 
 export default mongoose.model('tickets', TicketSchema);
