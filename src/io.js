@@ -1,3 +1,4 @@
+/*eslint-disable */
 import socketIO from 'socket.io';
 
 const io = socketIO();
@@ -12,7 +13,15 @@ io.on('connection', socket => {
 });
 
 const clients = io.of('/client').on('connection', socket => {
-    cl
+
+    function serverError(err, message) {
+        console.log(err);
+        socket.emit('serverError', { message })
+    }
+
+    socket.on('loadChuyenxe', token => {
+        
+    })
 })
 
 export default io;
