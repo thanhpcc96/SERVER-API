@@ -61,13 +61,23 @@ export function _get1Chuyenxe(keyChuyen) {
     });
 }
 
-export function _pickChuyen(userID, chuyenID, chongoi) {
+export function _pickChuyen(userID, chuyenID, chongoi,thongtinticket) {
     return new Promise((resolve, reject) => {
         const maTicket = chuyenID + crypto.randomBytes(2).toString('hex');
         client.multi()
             .hmset('chuyenxe:' + chuyenID, { 'choNgoi': chongoi })
-            .sadd('chuyenxe:' + chuyenID + ':ve:', maTicket)
-            .sadd('ticket:' + maTicket + ':user:', userID)
-            .expire()
+            .sadd('ticket', maTicket)
+            .hmset('ticket'+maTicket,{
+                codeTicket: maTicket,
+                price: thongtinticket.price.toString(),
+                dateOfStart: thongtinticket.dateOfStart.toString(),
+                routeOfTicket: thongtinticket.routeOfTicket.toString(),
+                inChuyenXe: chuyenID,
+                Customer: userID,
+                coupon: thongtinticket.coupon || '',
+                
+            })
+            .sadd('chuyenxe:' + chuyenID + ':ve', maTicket)
+            .sadd()
     })
 }
