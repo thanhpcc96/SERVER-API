@@ -16,32 +16,55 @@ const expire = 7200;
  * -chuyenxe duoc luu trong redis duong dang set
  * @return Promise
  */
-export function _getListChuyenXe() {
-    return new Promise((resolve, reject) => {
-        clientRedis.smembers('chuyenxe', (err, chuyens) => {
-            if (err) {
-                reject(err);
+export async function _getListChuyenXe() {
+    try {
+        const listIdchuyenxe = await clientRedis.smembers('chuyenxe');
+        console.log('===============================');
+        console.log(listIdchuyenxe);
+        console.log('===============================');
+        if (!listIdchuyenxe) {
+            return new Error('Khong co chuyen xe nao ca');
+        }
+        const returnChuyen = [];
+        const length = listIdchuyenxe.length;
+        listIdchuyenxe.forEach(key => {
+            let oneChuyen = _get1Chuyenxe(key);
+            if (oneChuyen) {
+                returnChuyen.push(oneChuyen);
             }
-            if (chuyens.length > 0) {
-                let length = chuyens.length;
-                let returnChuyen = [];
-                chuyens.forEach((key) => {
-                    _get1Chuyenxe(key).done((chuyen) => {
-                        returnChuyen.push(chuyen);
-                        length--;
-                        if (length === 0) {
-                            resolve(returnChuyen);
-                        }
-                    }, (err) => {
-                        reject(err)
-                    })
-                })
-            } else {
-                resolve([]);
+            length--;
+            if (length === 0) {
+                return;
             }
+        });
 
-        })
-    })
+    } catch (err) {
+        return err;
+    }
+    // return new Promise((resolve, reject) => {
+    //     clientRedis.smembers('chuyenxe', (err, chuyens) => {
+    //         if (err) {
+    //             reject(err);
+    //         }
+    //         if (chuyens.length > 0) {
+    //             let length = chuyens.length;
+    //             let returnChuyen = [];
+    //             chuyens.forEach((key) => {
+    //                 _get1Chuyenxe(key).done((chuyen) => {
+    //                     returnChuyen.push(chuyen);
+    //                     length--;
+    //                     if (length === 0) {
+    //                         resolve(returnChuyen);
+    //                     }
+    //                 }, (err) => {
+    //                     reject(err)
+    //                 })
+    //             })
+    //         } else {
+    //             resolve([]);
+    //         }
+    //     })
+    // })
 }
 /**
  * Hamd get thong tin của 1 chuyến xe
@@ -49,20 +72,31 @@ export function _getListChuyenXe() {
  * @param {String} keyChuyen- Là objectId của chuyến xe trong mongodb sau 
  * khi bắn vào redis
  */
-export function _get1Chuyenxe(keyChuyen) {
-    return new Promise((resolve, reject) => {
-        clientRedis.hgetall('chuyenxe:' + keyChuyen, (err, listKey) => {
-            if (err) reject(err);
-            if (listKey === null) {
-                reject('Chuyen xe nay khong co thong tin, Loi Logic');
-            }
-            const returnChuyenxe = {};
-            Object.keys(listKey).forEach(chuyen => {
-                returnChuyenxe.chuyen = listKey[chuyen];
-            });
-            resolve({ IDchuyen: keyChuyen, data: JSON.parse(returnChuyenxe) });
+export async function _get1Chuyenxe(keyChuyen) {
+    try {
+        const chuyenxe = await clientRedis.hgetall('chuyenxe:' + keyChuyen);
+        if (!chuyenxe) { return new Error('Khong co du lieu chuyen xe nay') };
+        const returnChuyen = {};
+        Object.key(chuyenxe).forEach(chuyen => {
+            returnChuyen.chuyen = chuyenxe[chuyen]
         });
-    });
+        return JSON.parse(returnChuyen);
+    } catch (error) {
+        return error
+    }
+    // return new Promise((resolve, reject) => {
+    //     clientRedis.hgetall('chuyenxe:' + keyChuyen, (err, listKey) => {
+    //         if (err) reject(err);
+    //         if (listKey === null) {
+    //             reject('Chuyen xe nay khong co thong tin, Loi Logic');
+    //         }
+    //         const returnChuyenxe = {};
+    //         Object.keys(listKey).forEach(chuyen => {
+    //             returnChuyenxe.chuyen = listKey[chuyen];
+    //         });
+    //         resolve({ IDchuyen: keyChuyen, data: JSON.parse(returnChuyenxe) });
+    //     });
+    // });
 }
 
 export async function _pickChuyen(userID, chuyenID, chongoi, thongtinticket) {

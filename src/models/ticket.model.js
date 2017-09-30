@@ -50,12 +50,11 @@ const TicketSchema = new Schema({
 
 
 TicketSchema.pre('save', function (next) {
-    if ()
-        if (this.isModified('isAvaiable')) {
-            if (this.isAvaiable === true) {
-                this._removeTicketFromChuyenXe();
-            }
+    if (this.isModified('isAvaiable')) {
+        if (this.isAvaiable === true) {
+            this._removeTicketFromChuyenXe();
         }
+    }
     return next();
 });
 
@@ -71,8 +70,8 @@ TicketSchema.methods = {
             }
             if (result.ticketsInChuyen.indexOf(this._id)) {
                 result.ticketsInChuyen.remove(this._id);
-                result.save(err => {
-                    if (err) { return; }
+                result.save(error => {
+                    if (error) { return; }
                 })
             }
         });
