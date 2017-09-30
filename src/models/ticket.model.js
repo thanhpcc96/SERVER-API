@@ -37,6 +37,10 @@ const TicketSchema = new Schema({
         type: Boolean,
         default: false
     },
+    typeTicket: {
+        type: String,
+        default: 'GIUCHO'
+    },
     isPayed: {
         type: Boolean,
         default: false
@@ -75,8 +79,18 @@ TicketSchema.methods = {
     }
 }
 
-TicketSchema.static={
-    create 
+TicketSchema.static = {
+    /**
+     * Overload lai ham create model
+     * @param {Object} arg 
+     * @param {ClientID} client 
+     */
+    createTicket(arg, client) {
+        return this.createTicket({
+            ...arg,
+            Customer: client
+        });
+    },
 }
 
 export default mongoose.model('tickets', TicketSchema);

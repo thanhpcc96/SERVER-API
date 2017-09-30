@@ -21,6 +21,12 @@ const ClientUserSchema = new Schema({
                 type: Schema.Types.ObjectId,
                 ref: 'tickets'
             }
+        ],
+        history_pick_keep_seat:[
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'tickets'
+            }
         ]
     },
     info: {

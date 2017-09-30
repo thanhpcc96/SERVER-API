@@ -2,9 +2,10 @@
 import redis from 'redis';
 import crypto from 'crypto';
 
-import ChuyenxeModel from '../models/chuyenxe.model';
+import TicketModel from '../models/ticket.model';
+import ClientModel from '../models/client.model';
 
-const client = redis.createClient();
+const clientRedis = redis.createClient();
 const expire = 7200;
 
 
@@ -17,7 +18,7 @@ const expire = 7200;
  */
 export function _getListChuyenXe() {
     return new Promise((resolve, reject) => {
-        client.smembers('chuyenxe', (err, chuyens) => {
+        clientRedis.smembers('chuyenxe', (err, chuyens) => {
             if (err) {
                 reject(err);
             }
@@ -50,7 +51,7 @@ export function _getListChuyenXe() {
  */
 export function _get1Chuyenxe(keyChuyen) {
     return new Promise((resolve, reject) => {
-        client.hgetall('chuyenxe:' + keyChuyen, (err, listKey) => {
+        clientRedis.hgetall('chuyenxe:' + keyChuyen, (err, listKey) => {
             if (err) reject(err);
             if (listKey === null) {
                 reject('Chuyen xe nay khong co thong tin, Loi Logic');
@@ -65,10 +66,29 @@ export function _get1Chuyenxe(keyChuyen) {
 }
 
 export async function _pickChuyen(userID, chuyenID, chongoi, thongtinticket) {
-try {
-    const arrPromise= Promise.all(await ) 
-} catch (err) {
-    return err;
+    try {
+        const maTicket = chuyenID + crypto.randomBytes(2).toString('hex');
+        thongtinticket.codeTicket = maTicket;
+        const client = await ClientModel.findById(userID);
+        if (!client) { return new Error() }
+        if (client.acount_payment.balance >= thongtinticket.price) {
+            client.acount_payment.balance = client.acount_payment.balance - thongtinticket.price;
+            client.acount_payment.history_transaction.push(maTicket);
+            thongtinticket.typeTicket = "DATVE";
+        }
+        else {
+            thongtinticket.typeTicket = "GIUCHO";
+            client.acount_payment.history_pick_keep_seat.push(maTicket);
+        }
+        const arrPromise = await Promise.all([
+            client.save(),
+            TicketModel.createTicket(thongtinticket, userID),
+            clientRedis.hmset('chuyenxe:' + chuyenID, { choNgoi: chongoi - 1 })
+        ]);
+        return arrPromise[1];
+    } catch (err) {
+        return err;
+    }
 }
 
 
@@ -77,9 +97,9 @@ try {
 
 
 
-
+/**
     return new Promise((resolve, reject) => {
-        const maTicket = chuyenID + crypto.randomBytes(2).toString('hex');
+
         client.multi()
             .hmset('chuyenxe:' + chuyenID, { 'choNgoi': chongoi })
             .exec(err => {
@@ -92,7 +112,7 @@ try {
 
     })
 }
-/**
+
  * .sadd('ticket', maTicket)
             .hmset('ticket:' + maTicket, {
                 codeTicket: maTicket,
