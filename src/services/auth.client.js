@@ -47,8 +47,8 @@ const jwtLogin = new JWTStrategy(jwtOpt, async (payload, done) => {
     }
 });
 
-passport.use(localLogin);
-passport.use(jwtLogin);
+passport.use('clientlocal', localLogin);
+passport.use('clientjwt', jwtLogin);
 
-export const authLocal = passport.authenticate('local', { session: false });
-export const authJwt = passport.authenticate('jwt', { session: false });
+export const authLocal = passport.authenticate('clientlocal', { session: false });
+export const authJwt = passport.authenticate('clientjwt', { session: false });

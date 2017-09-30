@@ -1,49 +1,24 @@
 /*eslint-disable */
 import socketIO from 'socket.io';
-import jwt from 'jsonwebtoken';
-
-import * as Client from './streaming/client';
+import redis from 'redis';
+import adapter from 'socket.io-redis'
 
 
 const io = socketIO();
-let countClient = 0;
+
+// Ep Socket.io chi su dung duy nhat websocket. Khong su dung ket noi lau hon.
+io.set('transports', ['websocket']);
+
+const pubClient = redis.createClient();
+const subClient = redis.createClient({ return_buffers: true });
+
+// set adapter cho socketio
+io.adapter(adapter({ pubClient, subClient }));
 
 /**
- *  Test streaming tren defaut path '/'
+ * Có lên sử dụng session store không nhỉ?
+ * Chắc không! haha đã pubsub rồi bắn store làm mẹ gì? are you ok?
  */
-io.on('connection', socket => {
-    //countClient = countClient + 1;
-    //socket.emit('countlient', countClient);
-});
 
-const clients = io.of('/client').on('connection', socket => {
-    countClient = countClient + 1;
-    socket.emit('online', countClient);
-
-    // socket.use((socket, next) => {
-    //     const token = socket.request.query.token;
-    //     const info = jwt.decode(token);
-
-    // });
-
-    function serverError(err, message) {
-        console.log(err);
-        socket.emit('serverError', { message })
-    }
-
-    socket.on('loadChuyenxe', async () => {
-        const list= await Client._getListChuyenXe();
-        console.log('=============================================');
-        console.log(list);
-        console.log('=============================================');
-        if(list){
-            list.forEach(item=>{
-                socket.emit('vote',item);
-            })
-        }else{
-            serverError(null,'Loi me no roi');
-        }
-    })
-});
 
 export default io;
