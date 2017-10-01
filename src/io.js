@@ -53,7 +53,7 @@ io.of('/client').on('connection', socket => {
 
     // pick chuyen
 
-    socket.on()
+    socket.on('pickchuyen',())
 })
 
 
