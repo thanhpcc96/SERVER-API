@@ -2,8 +2,11 @@
 import socketIO from 'socket.io';
 import redis from 'redis';
 import adapter from 'socket.io-redis';
-import chuyenxeModel from './models/chuyenxe.model';
+import crypto from 'crypto';
 
+import chuyenxeModel from './models/chuyenxe.model';
+import TicketModel from './models/ticket.model';
+import ClientModel from './models/client.model';
 
 const io = socketIO();
 
@@ -38,7 +41,7 @@ io.of('/client').on('connection', socket => {
             }).
             exec((err, result) => {
                 if (err) {
-                    socket.emit('updateListChuyenxe', {err: "Không load được list Chuyen xe"});
+                    socket.emit('updateListChuyenxe', { err: "Không load được list Chuyen xe" });
                 }
                 console.log('===============================');
                 console.log(result);
@@ -53,7 +56,45 @@ io.of('/client').on('connection', socket => {
 
     // pick chuyen
 
-    socket.on('pickchuyen',())
+    socket.on('timlotrinh', (tu, den) => {
+
+    });
+
+    socket.on('pickchuyenxe', info => {
+        if (!info.userID) {
+            return;
+        }
+        const codeTicket = info.idchuyen + crypto.randomBytes(2).toString('hex');
+        const newTicket = {
+            codeTicket,
+            price: info.price,
+            dateOfStart: info.dateOfStart,
+            routeOfTicket: {
+                from: info.tu,
+                to: info.den
+            },
+            inChuyenXe: info.idchuyen,
+            Customer: info.userID,
+            coupon: info.coupon || '',
+            isAvaiable: false,
+        }
+        ClientModel.findById(info.userID, (err, client) => {
+            if (err) { return }
+            if (!client) { return }
+            if (client.acount_payment.balance >= info.price) {
+                client.acount_payment.balance = client.acount_payment.balance - info.price;
+                client.acount_payment.history_transaction.push(codeTicket);
+                newTicket.
+            }
+            else {
+                client.acount_payment.history_pick_keep_seat.push(codeTicket);
+            }
+        })
+
+
+
+
+    })
 })
 
 
