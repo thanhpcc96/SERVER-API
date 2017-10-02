@@ -84,11 +84,27 @@ io.of('/client').on('connection', socket => {
             if (client.acount_payment.balance >= info.price) {
                 client.acount_payment.balance = client.acount_payment.balance - info.price;
                 client.acount_payment.history_transaction.push(codeTicket);
-                newTicket.
+                newTicket.typeTicket = "DATVE";
+                newTicket.isPayed = true;
             }
             else {
                 client.acount_payment.history_pick_keep_seat.push(codeTicket);
+                newTicket.typeTicket = "GIUCHO";
+                newTicket.isPayed = false;
             }
+            client.save(err => {
+                if (err) {
+                    socket.emit('Loi')
+                }
+
+            });
+        });
+        TicketModel.create(newTicket, (err, result) => {
+            if (err) {
+                socket.emit('error', { message: 'Xuat hien loi' });
+            }
+            
+
         })
 
 
