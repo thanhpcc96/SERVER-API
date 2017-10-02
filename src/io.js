@@ -74,7 +74,18 @@ io.of('/client').on('connection', socket => {
             if (!result) {
                 socket.emit('infoCoupon', { message: 'Coupon không tồn tại' });
             }
-            socket.emit('infoCoupon', result)
+            if (result.begin <= Date.now() && Date.now() <= result.end && result.){
+                if (result.solanDaApdung < result.solanApdung) {
+                    socket.emit('infoCoupon', result);
+                }
+                else {
+                    socket.emit('infoCoupon', { message: 'Coupon đã được sử dụng hết' });
+                }
+            }
+            else {
+                socket.emit('infoCoupon', { message: "Coupon không có hiệu lực hoặc hết hạn!" })
+            }
+
         })
     });
 
@@ -90,15 +101,9 @@ io.of('/client').on('connection', socket => {
         if (!info.userID) {
             return;
         }
-        if(info.coupon){
-            couponModel.findOneAndUpdate({code: info.coupon},{
-                
-            })
-        }
         const codeTicket = info.idchuyen + crypto.randomBytes(2).toString('hex');
         const newTicket = {
             codeTicket,
-            price: info.price,
             dateOfStart: info.dateOfStart,
             routeOfTicket: {
                 from: info.tu,
@@ -106,14 +111,26 @@ io.of('/client').on('connection', socket => {
             },
             inChuyenXe: info.idchuyen,
             Customer: info.userID,
-            coupon: info.coupon || '',
             isAvaiable: false,
+        }
+        if (info.coupon) {
+            couponModel.findOneAndUpdate({ code: info.coupon }, { '$set': { 'solanDaApdung': solanDaApdung + 1 } }, (err, coupon) => {
+                if (err) {
+                    socket.emit('resultPick', { message: 'Có người nhanh tay hơn bạn rồi' });
+                    return;
+                }
+                newTicket.price = info.price - (coupon.giamTheoLoai * info.price) / 100;
+                newTicket.coupon = coupon.code;
+            });
+        } else {
+            newTicket.price = info.price;
+            newTicket.coupon = '';
         }
         ClientModel.findById(info.userID, (err, client) => {
             if (err) { return }
             if (!client) { return }
-            if (client.acount_payment.balance >= info.price) {
-                client.acount_payment.balance = client.acount_payment.balance - info.price;
+            if (client.acount_payment.balance >= newTicket.price) {
+                client.acount_payment.balance = client.acount_payment.balance - newTicket.price;
                 client.acount_payment.history_transaction.push(codeTicket);
                 newTicket.typeTicket = "DATVE";
                 newTicket.isPayed = true;
@@ -125,18 +142,19 @@ io.of('/client').on('connection', socket => {
             }
             client.save(err => {
                 if (err) {
-                    socket.emit('Loi')
+                    socket.emit('resultPick', { message: 'Đặt vé không thành công' });
+                    return;
                 }
-
+                TicketModel.create(newTicket, (err, result) => {
+                    if (err) {
+                        socket.emit('resultPick', { message: 'Không thể tạo vé' });
+                        return;
+                    }
+                    socket.emit('resultPick', result);
+                });
             });
         });
-        TicketModel.create(newTicket, (err, result) => {
-            if (err) {
-                socket.emit('error', { message: 'Xuat hien loi' });
-            }
 
-
-        })
 
 
 

@@ -31,6 +31,9 @@ const coupons= new Schema({
         min:1,
         default:1
     },
+    solanDaApdung:{
+        type: Number
+    },
     isEndable:{
         type: Boolean,
         default: false
