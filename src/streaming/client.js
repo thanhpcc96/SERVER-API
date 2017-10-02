@@ -301,4 +301,19 @@ export const clientSocket = io => {
             });
         });
     });
+
+    io.of('/tracking').on('connection', socket => {
+        socket.on('check', chuyenxeID => {
+            chuyenxeModel.findById(chuyenxeID, (err, chuyenxe) => {
+                if (err) { throw err }
+                if(!chuyenxe){
+                    // báo cho client 
+                    socket.emit('clientInChuyen',{message: 'Chuyến xe không tồn tại'})
+                }else{
+                    // join to chanel với Id chuyến
+                    socket.join(chuyenxeID);
+                }
+            });
+        })
+    });
 }

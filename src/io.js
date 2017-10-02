@@ -2,12 +2,8 @@
 import socketIO from 'socket.io';
 import redis from 'redis';
 import adapter from 'socket.io-redis';
-import crypto from 'crypto';
 
-import chuyenxeModel from './models/chuyenxe.model';
-import TicketModel from './models/ticket.model';
-import ClientModel from './models/client.model';
-import couponModel from './models/coupons.model';
+import { clientSocket } from './streaming/client';
 
 const io = socketIO();
 
@@ -27,8 +23,9 @@ io.adapter(adapter({ pubClient, subClient }));
 
 
 /**
- *  Them cac io event
+ *  Them cac io event client
  */
+clientSocket(io);
 
 
 
