@@ -150,17 +150,23 @@ io.of('/client').on('connection', socket => {
                         socket.emit('resultPick', { message: 'Không thể tạo vé' });
                         return;
                     }
+                    chuyenxeModel.findById(info, (err, chuyenxe) => {
+                        if (err) {
+                            return;
+                        }
+                        chuyenxe.ticketsInChuyen.push(codeTicket);
+                        chuyenxe.save(err => {
+                            if (err) { return }
+                            socket.broadcast.emit('listChuyenChanged');
+                        })
+                    });
                     socket.emit('resultPick', result);
                 });
             });
         });
+    });
 
-
-
-
-
-    })
-})
+});
 
 
 export default io;
