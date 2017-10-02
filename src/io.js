@@ -7,6 +7,7 @@ import crypto from 'crypto';
 import chuyenxeModel from './models/chuyenxe.model';
 import TicketModel from './models/ticket.model';
 import ClientModel from './models/client.model';
+import couponModel from './models/coupons.model';
 
 const io = socketIO();
 
@@ -54,15 +55,45 @@ io.of('/client').on('connection', socket => {
         socket.broadcast.emit('updateListChuyenxe', listchuyen);
     });
 
+    socket.on('laychitietchuyen', idChuyen => {
+        chuyenxeModel.findById(idChuyen)
+            .populate('laixevaphuxe')
+            .exec((err, result) => {
+                if (err) {
+                    console.log('===============================');
+                    console.log(err);
+                    console.log('===============================');
+                }
+                socket.emit('chitietchuyen', result)
+            });
+    });
+
+    socket.on('checkcoupon', code => {
+        couponModel.findOne({ code: code }, (err, result) => {
+            if (err) { return }
+            if (!result) {
+                socket.emit('infoCoupon', { message: 'Coupon không tồn tại' });
+            }
+            socket.emit('infoCoupon', result)
+        })
+    });
+
     // pick chuyen
 
     socket.on('timlotrinh', (tu, den) => {
 
     });
-
+    /**
+     * event pick chuyen xe
+     */
     socket.on('pickchuyenxe', info => {
         if (!info.userID) {
             return;
+        }
+        if(info.coupon){
+            couponModel.findOneAndUpdate({code: info.coupon},{
+                
+            })
         }
         const codeTicket = info.idchuyen + crypto.randomBytes(2).toString('hex');
         const newTicket = {
@@ -103,7 +134,7 @@ io.of('/client').on('connection', socket => {
             if (err) {
                 socket.emit('error', { message: 'Xuat hien loi' });
             }
-            
+
 
         })
 
