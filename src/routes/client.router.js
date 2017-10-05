@@ -13,6 +13,8 @@ route.post('/forgot',ClientController._postResetPassword); //_resetPassword
 
 route.get("/all", ClientController._getAll);
 
+route.get('/profile/:id', ClientController._getInfo);
+
 //route.post('/reset/:token',ClientController._resetPassword);
 
 export default route;

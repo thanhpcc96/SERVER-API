@@ -1,5 +1,6 @@
 /*eslint-disable */
 import crypto from 'crypto';
+import redis from 'redis';
 
 import chuyenxeModel from './models/chuyenxe.model';
 import TicketModel from './models/ticket.model';

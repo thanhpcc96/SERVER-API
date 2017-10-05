@@ -15,7 +15,7 @@ let trackingState = {};
 const emitRoute = (routeName, routeNodes, currentIndex) => {
     if (currentIndex === routeNodes.lenght) {
         return setTimeout(() => {
-            emitRoute(routeName, routeNodes, 0);
+            emitRoute(routeName, routeNodes, 0, chuyenxeID);
         }, 3000);
     }
     trackingState = Object.assign(trackingState, {
@@ -79,5 +79,38 @@ const run = io => {
             });
         });
     });
+}
+
+const checkOneChuyen= (io, chuyenxeID)=>{
+    Socket = io;
+    fs.readFile(`${dirName}${chuyenxeID}.gpx`,(err,content)=>{
+        if(err){
+            console.log('===============================');
+            console.log(err);
+            console.log('===============================');
+            return;
+        }
+
+        trackingState = Object.assign(trackingState, {
+            [chuyenxeID]: { lat: 0, lng: 0 }
+        });
+         // Parse XML với cheerio
+         const $ = cheerio.load(content, {
+            normalizeWhitespace: true,
+            xmlMode: true
+        });
+
+        // chuyển đổi xmlNode object sang object trong js {lat: ..., lng: ...} 
+        const routeNodes = $('wpt').map((i, node) => ({
+            lat: Number($(node).attr('lat')),
+            lng: Number($(node).attr('lon'))
+        })).get();
+
+        // emit route to client
+        if (routeNodes.length > 0) {
+            emitRoute(chuyenxeID, routeNodes, 0,)
+        }
+
+    })
 }
 export default run;

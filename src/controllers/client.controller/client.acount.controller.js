@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import HTTPStatus from 'http-status';
 
 import agenda from '../../jobLoader'; // config worker */
 import Client from '../../models/client.model';
@@ -12,16 +13,21 @@ export async function _getAll(req, res) {
     try {
         const list = await Client.find();
         console.log(list);
-        return res.status(200).json({ err: false ,result: list })
+        return res.status(HTTPStatus.OK).json({ err: false ,result: list })
     } catch (err) {
-        return res.status(503).json({ err: true, message: " Loi" })
+        return res.status(HTTPStatus.BAD_REQUEST).json({ err: true, message: " Loi" })
     }
 }
+/**
+ * Hàm post Đăng ký
+ * @param {*} req 
+ * @param {*} res 
+ */
 export async function _postRegister(req, res) {
     try {
         const client = await Client.findOne({ "local.email": req.body.email });
         if (client) {
-            return res.status(401).json({ error: true, message: 'Tai khoan nay da ton tai' })
+            return res.status(HTTPStatus.NOT_ACCEPTABLE).json({ error: true, message: 'Tai khoan nay da ton tai' })
         }
 
         const newClient = new Client();
@@ -31,12 +37,12 @@ export async function _postRegister(req, res) {
         newClient.local.email = req.body.email;
         newClient.local.password = req.body.password;
         newClient.status = "ACTIVE"; // chưa kích hoạt
-        return res.status(200).json({ error: false, result: await newClient.save() });
+        return res.status(HTTPStatus.CREATED).json({ error: false, result: await newClient.save() });
 
 
     } catch (err) {
         console.log("Loi dang ky: " + err);
-        return res.status(503).json({ error: true, message: 'Co loi xay ra' + err.toString() });
+        return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).json({ error: true, message: 'Co loi xay ra' + err.toString() });
     }
 }
 /*
@@ -47,6 +53,16 @@ export function _postLogin(req, res, next) {
     return next();
 
 }
+
+export async function _getInfo(req,res){
+    try {
+        return res.status(HTTPStatus.OK).json({err: false; result: await Client.findById(req.params.id)});
+    } catch (err) {
+        return res.status(HTTPStatus.BAD_REQUEST).json({err: true, message:"Xuat hien loi tu hanh dong cua ban"});
+    }
+}
+
+
 /*
 ** post forgot password
 */
