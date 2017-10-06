@@ -308,28 +308,42 @@ export const clientSocket = io => {
         });
         // đang làm thì mất điện
         socket.on('cancelChuyen', async (chuyenxeID, clientID, ticketID) => {
-            const arrPromise= await Promise.all([
+            const arrPromise = await Promise.all([
                 ticketID.findById(ticketID),
-                ClientModel.findById(clientID),
-                chuyenxeModel.findById(chuyenxeID)
+                ClientModel.findById(clientID)
             ]);
-            const ticketResult= arrPromise[0];
-            const clientResult= arrPromise[1];
-            const typeTicket= ticketResult.typeTicket;
-            if(typeTicket==='GIUCHO'){
+            const ticketResult = arrPromise[0];
+            const clientResult = arrPromise[1];
+
+            const typeTicket = ticketResult.typeTicket;
+            if (typeTicket === 'GIUCHO') {
                 /* Remove vé ra khỏi lịch đặt chỗ của khách hàng */
                 clientResult.acount_payment.history_pick_keep_seat.remove(ticketID);
-                 /* Push vé vừa hủy vảo lịch sử Hủy chuyến */
+                /* Push vé vừa hủy vảo lịch sử Hủy chuyến */
                 clientIDResult.acount_payment.history_cancel_ticket.push(ticketID);
+                /* Update trạng thái vé về hủy bỏ ====> Middleware sẽ auto remove vé khỏi xe */
+                ticketResult.isAvaiable = true;
             }
-            if(typeTicket==='DATVE'){
+            if (typeTicket === 'DATVE') {
                 /* Remove vé ra khỏi lịch sử giao dịch của khách hàng thanh toán trước*/
                 clientResult.acount_payment.history_pick_keep_seat.remove(ticketID);
-                 /* Push vé vừa hủy vảo lịch sử Hủy chuyến */
+                /* Push vé vừa hủy vảo lịch sử Hủy chuyến */
                 clientIDResult.acount_payment.history_cancel_ticket.push(ticketID);
-                 /* Đồng thời hoàn lại 80% số tiền so với giá trị vé lại cho khách hành*/
-                clientResult.acount_payment.balance = clientResult.acount_payment.balance + 80 * ticketResult.price / 100; 
+                /* Đồng thời hoàn lại 80% số tiền so với giá trị vé lại cho khách hành*/
+                clientResult.acount_payment.balance = clientResult.acount_payment.balance + 80 * ticketResult.price / 100;
+                /* Update trạng thái vé về hủy bỏ ====> Middleware sẽ auto remove vé khỏi xe */
+                ticketResult.isAvaiable = true;
             }
+            const arrPromiseSaved = await Promise.all([
+                ticketResult.save(),
+                clientResult.save(),
+            ]);
+            const clientAfterSave = arrPromiseSaved[1], ticketAffterSave = arrPromiseSaved[0];
+            if (!clientAfterSave || ticketAffterSave) {
+                socket.emit('cancelResult', { message: "Loi khong huy duoc ve" });
+                return;
+            }
+            socket.broadcast.emit('listChuyenChanged');
 
         })
     });
