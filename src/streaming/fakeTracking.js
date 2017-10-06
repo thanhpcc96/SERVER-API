@@ -15,7 +15,7 @@ let trackingState = {};
 const emitRoute = (routeName, routeNodes, currentIndex) => {
     if (currentIndex === routeNodes.lenght) {
         return setTimeout(() => {
-            emitRoute(routeName, routeNodes, 0, chuyenxeID);
+            emitRoute(routeName, routeNodes, 0);
         }, 3000);
     }
     trackingState = Object.assign(trackingState, {
@@ -23,8 +23,8 @@ const emitRoute = (routeName, routeNodes, currentIndex) => {
     });
 
     Socket.emit('locationUpdate', trackingState); // bắn ra cho thằng emit
-    Socket.in(routeName).emit('locationUpdate', trackingState); // bắn ra cho cả room
-    Socket.of('/trackingAdmin').emit('locationUpdate', trackingState); // bắn ra cho namespace addmin
+    Socket.broadcast.to(routeName).emit('locationUpdate', trackingState); // bắn ra cho cả room
+    /* Socket.of('/trackingAdmin').emit('locationUpdate', trackingState); // bắn ra cho namespace addmin */
 
     // random range 500-1000
     const delayTime = Math.random() * (1000 - 500) + 500;

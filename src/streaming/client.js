@@ -7,6 +7,8 @@ import TicketModel from './models/ticket.model';
 import ClientModel from './models/client.model';
 import couponModel from './models/coupons.model';
 
+import execTracking from './fakeTracking';
+
 // const clientRedis = redis.createClient();
 // const expire = 7200;
 
@@ -166,6 +168,7 @@ import couponModel from './models/coupons.model';
 //  */
 export const clientSocket = io => {
     const clientIO= io.of('/client');
+    clientIO.set('authorization',)
     clientIO.on('connection', socket => {
 
         const listchuyen = [];
@@ -303,19 +306,20 @@ export const clientSocket = io => {
             });
         });
     });
-
-    io.of('/tracking').on('connection', socket => {
+    const clientTrackingIO= io.of("/tracking");
+    clientTrackingIO.on('connection', socket => {
         socket.on('check', chuyenxeID => {
             chuyenxeModel.findById(chuyenxeID, (err, chuyenxe) => {
                 if (err) { throw err }
                 if(!chuyenxe){
                     // báo cho client 
-                    socket.emit('clientInChuyen',{message: 'Chuyến xe không tồn tại'})
+                    socket.emit('locationUpdate',{message: 'Chuyến xe không tồn tại'})
                 }else{
                     // join to chanel với Id chuyến
                     socket.join(chuyenxeID);
+                    execTracking(clientTrackingIO,chuyenxeID);
                 }
             });
-        })
+        });
     });
 }

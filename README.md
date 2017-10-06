@@ -6,3 +6,5 @@
 
 > Thay vì sử dụng Kue js, mình thay thế bằng Agenda vì nó sử dụng mongodb để lưu trữ jobs xây dựng core base code của nó nhỏ gọn, xây dựng trên event emmiter core của Nodejs( thằng kue sử dụng redis rất mạnh nhưng do hạn chế là nó ko cho phép interval job và perform không cao)
 
+# Tại sao lại sử dụng socketio-jwt
+![alt text](https://raw.githubusercontent.com/username/projectname/branch/path/to/socketio-jwt.png)
