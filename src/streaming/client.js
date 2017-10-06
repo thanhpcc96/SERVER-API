@@ -1,6 +1,7 @@
 /*eslint-disable */
 import crypto from 'crypto';
 import redis from 'redis';
+import socketJWT from 'socketio-jwt';
 
 import chuyenxeModel from './models/chuyenxe.model';
 import TicketModel from './models/ticket.model';
@@ -167,8 +168,8 @@ import execTracking from './fakeTracking';
 //             .sadd()
 //  */
 export const clientSocket = io => {
-    const clientIO= io.of('/client');
-    clientIO.set('authorization',)
+    const clientIO = io.of('/client');
+    clientIO.set('authorization', )
     clientIO.on('connection', socket => {
 
         const listchuyen = [];
@@ -305,21 +306,48 @@ export const clientSocket = io => {
                 });
             });
         });
+        // đang làm thì mất điện
+        socket.on('cancelChuyen', async (chuyenxeID, clientID, ticketID) => {
+            const arrPromise= await Promise.all([
+                ticketID.findById(ticketID),
+                ClientModel.findById(clientID),
+                chuyenxeModel.findById(chuyenxeID)
+            ]);
+            const ticketResult= arrPromise[0];
+            const clientResult= arrPromise[1];
+            const typeTicket= ticketResult.typeTicket;
+            if(typeTicket==='GIUCHO'){
+                /* Remove vé ra khỏi lịch đặt chỗ của khách hàng */
+                clientResult.acount_payment.history_pick_keep_seat.remove(ticketID);
+                 /* Push vé vừa hủy vảo lịch sử Hủy chuyến */
+                clientIDResult.acount_payment.history_cancel_ticket.push(ticketID);
+            }
+            if(typeTicket==='DATVE'){
+                /* Remove vé ra khỏi lịch sử giao dịch của khách hàng thanh toán trước*/
+                clientResult.acount_payment.history_pick_keep_seat.remove(ticketID);
+                 /* Push vé vừa hủy vảo lịch sử Hủy chuyến */
+                clientIDResult.acount_payment.history_cancel_ticket.push(ticketID);
+                 /* Đồng thời hoàn lại 80% số tiền so với giá trị vé lại cho khách hành*/
+                clientResult.acount_payment.balance = clientResult.acount_payment.balance + 80 * ticketResult.price / 100; 
+            }
+
+        })
     });
-    const clientTrackingIO= io.of("/tracking");
+    const clientTrackingIO = io.of("/tracking");
     clientTrackingIO.on('connection', socket => {
         socket.on('check', chuyenxeID => {
             chuyenxeModel.findById(chuyenxeID, (err, chuyenxe) => {
                 if (err) { throw err }
-                if(!chuyenxe){
+                if (!chuyenxe) {
                     // báo cho client 
-                    socket.emit('locationUpdate',{message: 'Chuyến xe không tồn tại'})
-                }else{
+                    socket.emit('locationUpdate', { message: 'Chuyến xe không tồn tại' })
+                } else {
                     // join to chanel với Id chuyến
                     socket.join(chuyenxeID);
-                    execTracking(clientTrackingIO,chuyenxeID);
+                    execTracking(clientTrackingIO, chuyenxeID);
                 }
             });
         });
+
     });
 }

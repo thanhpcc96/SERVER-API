@@ -27,6 +27,12 @@ const ClientUserSchema = new Schema({
                 type: Schema.Types.ObjectId,
                 ref: 'tickets'
             }
+        ],
+        history_cancel_ticket:[
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'tickets'
+            }
         ]
     },
     info: {
