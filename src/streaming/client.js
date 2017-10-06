@@ -165,7 +165,8 @@ import couponModel from './models/coupons.model';
 //             .sadd()
 //  */
 export const clientSocket = io => {
-    io.of('/client').on('connection', socket => {
+    const clientIO= io.of('/client');
+    clientIO.on('connection', socket => {
 
         const listchuyen = [];
 

@@ -22,7 +22,9 @@ const emitRoute = (routeName, routeNodes, currentIndex) => {
         [routeName]: routeNodes[currentIndex]
     });
 
-    Socket.emit('locationUpdate', trackingState);
+    Socket.emit('locationUpdate', trackingState); // bắn ra cho thằng emit
+    Socket.in(routeName).emit('locationUpdate', trackingState); // bắn ra cho cả room
+    Socket.of('/trackingAdmin').emit('locationUpdate', trackingState); // bắn ra cho namespace addmin
 
     // random range 500-1000
     const delayTime = Math.random() * (1000 - 500) + 500;
@@ -36,81 +38,81 @@ const emitRoute = (routeName, routeNodes, currentIndex) => {
  * @param {socket} io - Đối tượng socket
  */
 /* eslint-disable no-console */
-const run = io => {
+const run = (io, chuyenxeID) => {
     Socket = io;
-    fs.readdir(dirName, (err, filenames) => {
-        if (err) {
-            console.log('===============================');
-            console.log(err);
-            console.log('===============================');
-            return;
-        }
-        filenames.forEach(filename => {
-            // Kiểm tra định dạng file, chỉ chấp nhận *.gpx( đinh dạng file trich xuất tọa độ của google map)
-            const fileExtension = filename.split('.').pop();
-            if (fileExtension !== 'gpx') return;
-            fs.readFile(dirName + filename, 'utf-8', (e, content) => {
-                if (e) {
-                    console.log('===============================');
-                    console.log(e);
-                    console.log('===============================');
-                    return;
-                }
-                // đẩy nội dung của file gpx vào trackingState
-                trackingState = Object.assign(trackingState, {
-                    [filename]: { lat: 0, lng: 0 }
-                });
-                // Parse XML với cheerio
-                const $ = cheerio.load(content, {
-                    normalizeWhitespace: true,
-                    xmlMode: true
-                });
+    if (!chuyenxeID) {
+        fs.readdir(dirName, (err, filenames) => {
+            if (err) {
+                console.log('===============================');
+                console.log(err);
+                console.log('===============================');
+                return;
+            }
+            filenames.forEach(filename => {
+                // Kiểm tra định dạng file, chỉ chấp nhận *.gpx( đinh dạng file trich xuất tọa độ của google map)
+                const fileExtension = filename.split('.').pop();
+                if (fileExtension !== 'gpx') return;
+                fs.readFile(dirName + filename, 'utf-8', (e, content) => {
+                    if (e) {
+                        console.log('===============================');
+                        console.log(e);
+                        console.log('===============================');
+                        return;
+                    }
+                    // đẩy nội dung của file gpx vào trackingState
+                    trackingState = Object.assign(trackingState, {
+                        [filename]: { lat: 0, lng: 0 }
+                    });
+                    // Parse XML với cheerio
+                    const $ = cheerio.load(content, {
+                        normalizeWhitespace: true,
+                        xmlMode: true
+                    });
 
-                // chuyển đổi xmlNode object sang object trong js {lat: ..., lng: ...} 
-                const routeNodes = $('wpt').map((i, node) => ({
-                    lat: Number($(node).attr('lat')),
-                    lng: Number($(node).attr('lon'))
-                })).get();
+                    // chuyển đổi xmlNode object sang object trong js {lat: ..., lng: ...} 
+                    const routeNodes = $('wpt').map((i, node) => ({
+                        lat: Number($(node).attr('lat')),
+                        lng: Number($(node).attr('lon'))
+                    })).get();
 
-                // emit route to client
-                if (routeNodes.length > 0) {
-                    emitRoute(filename, routeNodes, 0)
-                }
+                    // emit route to client
+                    if (routeNodes.length > 0) {
+                        emitRoute(filename, routeNodes, 0)
+                    }
+                });
             });
         });
-    });
+    }
+    else {
+        const fileName=`${dirName}${chuyenxeID}.gpx`;
+        fs.readFile(fileName, (err, content) => {
+            if(err){
+                console.log('===============================');
+                console.log(err);
+                console.log('===============================');
+                return;
+            }
+            trackingState = Object.assign(trackingState, {
+                [chuyenxeID]: { lat: 0, lng: 0 }
+            });
+            // Parse XML với cheerio
+            const $ = cheerio.load(content, {
+                normalizeWhitespace: true,
+                xmlMode: true
+            });
+            // chuyển đổi xmlNode object sang object trong js {lat: ..., lng: ...} 
+            const routeNodes = $('wpt').map((i, node) => ({
+                lat: Number($(node).attr('lat')),
+                lng: Number($(node).attr('lon'))
+            })).get();
+
+            // emit route to client
+            if (routeNodes.length > 0) {
+                emitRoute(chuyenxeID, routeNodes, 0)
+            }
+
+        })
+    }
 }
 
-const checkOneChuyen= (io, chuyenxeID)=>{
-    Socket = io;
-    fs.readFile(`${dirName}${chuyenxeID}.gpx`,(err,content)=>{
-        if(err){
-            console.log('===============================');
-            console.log(err);
-            console.log('===============================');
-            return;
-        }
-
-        trackingState = Object.assign(trackingState, {
-            [chuyenxeID]: { lat: 0, lng: 0 }
-        });
-         // Parse XML với cheerio
-         const $ = cheerio.load(content, {
-            normalizeWhitespace: true,
-            xmlMode: true
-        });
-
-        // chuyển đổi xmlNode object sang object trong js {lat: ..., lng: ...} 
-        const routeNodes = $('wpt').map((i, node) => ({
-            lat: Number($(node).attr('lat')),
-            lng: Number($(node).attr('lon'))
-        })).get();
-
-        // emit route to client
-        if (routeNodes.length > 0) {
-            emitRoute(chuyenxeID, routeNodes, 0,)
-        }
-
-    })
-}
 export default run;

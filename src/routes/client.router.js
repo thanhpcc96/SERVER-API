@@ -8,8 +8,10 @@ const route = new Router();
 route.post('/register',ClientController._postRegister);
 
 route.post('/login', authLocal, ClientController._postLogin);
-
-route.post('/forgot',ClientController._postResetPassword); //_resetPassword
+/*
+ _resetPassword
+ */
+route.post('/forgot',ClientController._postResetPassword); 
 
 route.get("/all", ClientController._getAll);
 

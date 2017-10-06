@@ -13,7 +13,7 @@ export async function _getAll(req, res) {
     try {
         const list = await Client.find();
         console.log(list);
-        return res.status(HTTPStatus.OK).json({ err: false ,result: list })
+        return res.status(HTTPStatus.OK).json({ err: false, result: list })
     } catch (err) {
         return res.status(HTTPStatus.BAD_REQUEST).json({ err: true, message: " Loi" })
     }
@@ -54,11 +54,11 @@ export function _postLogin(req, res, next) {
 
 }
 
-export async function _getInfo(req,res){
+export async function _getInfo(req, res) {
     try {
-        return res.status(HTTPStatus.OK).json({err: false; result: await Client.findById(req.params.id)});
+        return res.status(HTTPStatus.OK).json({ err: false, result: await Client.findById(req.params.id) });
     } catch (err) {
-        return res.status(HTTPStatus.BAD_REQUEST).json({err: true, message:"Xuat hien loi tu hanh dong cua ban"});
+        return res.status(HTTPStatus.BAD_REQUEST).json({ err: true, message: "Xuat hien loi tu hanh dong cua ban" });
     }
 }
 
