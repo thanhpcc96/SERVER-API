@@ -25,6 +25,9 @@ const LotrinhSchema = new Schema({
             type: String // địa phận , vị trí của chốt kiểm tra
         }
     ],
+    gpxFileName: {
+        type: String,
+    },
     xetronglotrinh: [
         {
             type: Schema.Types.ObjectId,
