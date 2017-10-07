@@ -3,10 +3,10 @@ import crypto from 'crypto';
 import redis from 'redis';
 import socketJWT from 'socketio-jwt';
 
-import chuyenxeModel from './models/chuyenxe.model';
-import TicketModel from './models/ticket.model';
-import ClientModel from './models/client.model';
-import couponModel from './models/coupons.model';
+import chuyenxeModel from '../models/chuyenxe.model';
+import TicketModel from '../models/ticket.model';
+import ClientModel from '../models/client.model';
+import couponModel from '../models/coupons.model';
 
 import execTracking from './fakeTracking';
 
@@ -169,7 +169,7 @@ import execTracking from './fakeTracking';
 //  */
 export const clientSocket = io => {
     const clientIO = io.of('/client');
-    clientIO.set('authorization', )
+    //clientIO.set('authorization', )
     clientIO.on('connection', socket => {
 
         const listchuyen = [];
@@ -215,7 +215,7 @@ export const clientSocket = io => {
                 if (!result) {
                     socket.emit('infoCoupon', { message: 'Coupon không tồn tại' });
                 }
-                if (result.begin <= Date.now() && Date.now() <= result.end && result.){
+                if (result.begin <= Date.now() && Date.now() <= result.end) {
                     if (result.solanDaApdung < result.solanApdung) {
                         socket.emit('infoCoupon', result);
                     }

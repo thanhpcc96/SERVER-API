@@ -11,7 +11,7 @@ refeshSeat(agenda);
 // job.save((err) => {
 //     console.log('Job successfully saved');
 // });
-//agenda.schedule('next day at 0', 'refeshseat');
+
 agenda.on('ready', () => {
     agenda.start();
     agenda.schedule('12 : 00 am','refeshseat');
