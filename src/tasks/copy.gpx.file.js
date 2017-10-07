@@ -1,9 +1,7 @@
 import fs from 'fs';
-import path from 'path';
 import moment from 'moment';
 
 import chuyenxeModel from '../models/chuyenxe.model';
-import lotrinhModel from '../models/lotrinh.model';
 
 export default function copyGPXfile(agenda) {
     agenda.define('copyfile', (job, done) => {
@@ -19,7 +17,7 @@ export default function copyGPXfile(agenda) {
                 result.forEach(item => {
                     /* Lấy tên chuyến xe bắn vào obj làm tên file gpx */
                     const obj = {
-                        tenchuyen: item.sochuyen,
+                        filename: item.sochuyen,
                         lotrinh: item.routeOfTrip.gpxFileName
                     }
                     arrName.push(obj);
@@ -43,13 +41,18 @@ export default function copyGPXfile(agenda) {
         fs.readdir('gpxLichtrinh/',(err, filenames)=>{
             if(err){ return done(new Error('khong the load file lich trinh goc'))}
             filenames.forEach(filename=>{
-                let data= fs.createReadStream(`gpxLichtrinh/${filename}`);
+                /* Tạo stream đọc file và copy bằng cách pipe vào luồng ghi file */
+                const data= fs.createReadStream(`gpxLichtrinh/${filename}`,{
+                    encoding: 'utf8',
+                });
+                /* So sánh nhừng chuyến nào có lộ trình giống tên file thì coppy */
                 arrName.forEach(item=>{
-                    if()
-                })
-
-            })
-        })
-
+                    if(item.lotrinh===filename){
+                        data.pipe(fs.createWriteStream(`../streaming/gpx-data/${item.filename}.gpx`))
+                    }
+                });
+            });
+        });
+        done();
     });
 }
