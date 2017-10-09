@@ -19,16 +19,16 @@ export async function _getReportRevenueDay(req, res) {
             /* Load những vé đăng ký trong ngày */
             TicketModel.find({}).populate({
                 path: 'inChuyenXe',
-                match: { timeStart: { $gt: now.set({ hour: 5, minute: 0 }) } }
+                match: { timeStart: { $gt: now.set({ hour: 5, minute: 0 }) } },
             }),
             /* Load những chuyến xe và thông tin từng chuyến xe trong trong ngày */
             ChuyenxeModel.find({
                 timeStart: { $gt: now.set({ hour: 5, minute: 0 }) }
             }).populate('routeOfTrip')
                 .populate('ticketsInChuyen'),
-
         ]);
-        
+    // xử lý sau
+
     } catch (err) {
         return res.status(HTTPStatus.BAD_REQUEST).json({ err: true, message: 'Loi phat sinh tu hanh dong cua ban' });
     }
