@@ -2,9 +2,19 @@
 
 ** Bảo vệ xong sẽ viết doc dành riêng xây dựng RESTfull api và GraphQL **
 
-# Nói sơ qua về sơ đồ phân dã chức năng
+# Phân tích thiết kế hệ thống
+>Sơ đồ phân rã chức năng
+![Sơ đồ phân dã chức năng](https://raw.githubusercontent.com/thanhpcc96/SERVER-API/master/screenshot/sodophanrachucnang.png)
+
+
 > Sơ đồ mức khung cảnh
 ![Sơ đồ phân dã chức năng](https://raw.githubusercontent.com/thanhpcc96/SERVER-API/master/screenshot/sodomucngucanh.png)
+
+
+> Sơ đồ mức đỉnh
+![Sơ đồ phân dã chức năng](https://raw.githubusercontent.com/thanhpcc96/SERVER-API/master/screenshot/mucdinh-11-10-2017.png)
+
+
 
 
 # Tại sao lại sử dụng Agenda để xây dựng Background Jobs

@@ -18,7 +18,7 @@ coppyFakeGPX(agenda);
 agenda.on('ready', () => {
     agenda.start();
     agenda.schedule('12 : 00 am', 'refeshseat');
-    agenda.schedule('12 : 05 am', 'copyfile');
+    // agenda.schedule('12 : 05 am', 'copyfile');
 });
 
 
