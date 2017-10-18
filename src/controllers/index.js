@@ -1,6 +1,5 @@
-import usercontroller from './user.controller';
+import usercontroller from "./user.controller";
+import clientControler from "./client.controller";
+import { _getClientSeeds } from "./seed.controller";
 
-const controllerRoot={
-    usercontroller,
-}
-export default controllerRoot;
+export { usercontroller, clientControler, _getClientSeeds };

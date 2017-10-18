@@ -1,21 +1,51 @@
-import {Router} from 'express';
-import {authLocal} from '../services/auth.client';
-import ClientController from '../controllers/client.controller';
+import { Router } from "express";
+import validate from "express-validation";
 
+import { authLocal, authJwt } from "../services/auth.client";
+import { clientControler } from "../controllers";
 
 const route = new Router();
 
-route.post('/register',ClientController._postRegister);
+const validation = clientControler.acountClientController.validation;
 
-route.post('/login', authLocal, ClientController._postLogin);
+route.post(
+  "/register",
+  validate(validation.resgiter),
+  clientControler.acountClientController._postRegister
+);
+
+route.post(
+  "/login",
+  validate(validation.login),
+  authLocal,
+  clientControler.acountClientController._postLogin
+);
 /*
  _resetPassword
  */
-route.post('/forgot',ClientController._postResetPassword); 
+route.post(
+  "/forgot",
+  validate(validation.resetpassword),
+  clientControler.acountClientController._postResetPassword
+);
 
-route.get("/all", ClientController._getAll);
+route.get("/all", clientControler.acountClientController._getAll);
 
-route.get('/profile/:id', ClientController._getInfo);
+route.get("/profile", authJwt, clientControler.acountClientController._getInfo);
+
+route.post(
+  "/profile",
+  authJwt,
+  validate(validation.updateInfo),
+  clientControler.acountClientController._postUpdateInfo
+);
+
+route.post(
+  "/profile/password",
+  authJwt,
+  validate(validation.updatePassWord),
+  clientControler.acountClientController._postUpdatePassword
+);
 
 //route.post('/reset/:token',ClientController._resetPassword);
 

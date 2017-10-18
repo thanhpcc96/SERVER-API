@@ -47,10 +47,10 @@ STT          | Tên chức năng
 ![Sơ đồ phân dã chức năng](https://raw.githubusercontent.com/thanhpcc96/SERVER-API/master/screenshot/mucdinh-11-10-2017.png)
 
 Sơ đồ luồng dữ liệu mức đỉnh phân tích các tương tác của người dùng với các nhóm chức năng của ứng dụng và sự ảnh hưởng tới kho dữ liệu:
--`−	Nhóm chức năng Quản lý tài khoản`
--`−	Nhóm chức năng Quản lý thông tin`
--`−	Nhóm chức năng Quản lý chuyến xe`
--`−	Nhóm chức năng Báo cáo thống kê`
+`−	Nhóm chức năng Quản lý tài khoản`
+`−	Nhóm chức năng Quản lý thông tin`
+`−	Nhóm chức năng Quản lý chuyến xe`
+`−	Nhóm chức năng Báo cáo thống kê`
 ## 5 DFD mức dưới đỉnh
 ### 5.1 DFD quản lý tài khoản
 Sơ đồ luồng dữ liệu của Quản lý Tài khoản mô tả các tương tác của người dùng đến nhóm chức năng Quản lý Tài khoản.
