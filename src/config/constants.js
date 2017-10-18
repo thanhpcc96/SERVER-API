@@ -2,7 +2,7 @@
 require("dotenv").config();
 
 const WHITELIST = {
-  posts: {
+  manager: {
     create: ["title", "text"],
     update: ["title", "text"]
   },

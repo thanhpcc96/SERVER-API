@@ -8,31 +8,37 @@ const route = new Router();
 
 const validation = clientControler.acountClientController.validation;
 
+/** Đăng ký */
 route.post(
   "/register",
   validate(validation.resgiter),
   clientControler.acountClientController._postRegister
 );
 
+/** đăng nhập */
 route.post(
   "/login",
   validate(validation.login),
   authLocal,
   clientControler.acountClientController._postLogin
 );
-/*
- _resetPassword
- */
+
+/** khôi phục mật khẩu */
 route.post(
   "/forgot",
   validate(validation.resetpassword),
   clientControler.acountClientController._postResetPassword
 );
 
+/* route.post('/reset/:token',ClientController._resetPassword) */
+
+/** Test get All */
 route.get("/all", clientControler.acountClientController._getAll);
 
+/** get thông tin cá nhân */
 route.get("/profile", authJwt, clientControler.acountClientController._getInfo);
 
+/** Update thông tin cá nhân */
 route.post(
   "/profile",
   authJwt,
@@ -40,6 +46,7 @@ route.post(
   clientControler.acountClientController._postUpdateInfo
 );
 
+/** Update mật khẩu */
 route.post(
   "/profile/password",
   authJwt,
@@ -47,6 +54,11 @@ route.post(
   clientControler.acountClientController._postUpdatePassword
 );
 
-//route.post('/reset/:token',ClientController._resetPassword);
+/** get thông tin lịch sử giao dịch */
+route.get(
+  "/profile/history",
+  authJwt,
+  clientControler.acountClientController._getHistoryExchange
+);
 
 export default route;

@@ -437,3 +437,71 @@ export async function _postUpdatePassword(req, res, next) {
     return next(err);
   }
 }
+
+/* =================================================================================================================================== */
+
+
+/**
+ * @api {get} /client/profile/histoty Lấy thông tin chit tiết lịch sử giao dichj của khách hàng
+ * @apiDescription lấy thông tin lịch sử giao dịch của khách hàng
+ * @apiName _getHistoryExchange
+ * @apiGroup Khách hàng
+ *
+ * @apiSuccess {Number} status Status code phản hồi Request.
+ *
+ * @apiSuccessExample Ví dụ đăng ký thành công
+ *
+ * HTTP/1.1 200 OK
+ *
+ * acount_payment: {
+      'balance': '1500000',
+      'history_recharge': [
+        {
+          "ngayNap": '22/10/2016',
+          "sotien" : "5000000"
+        }
+      ],
+      history_transaction: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "tickets"
+        }
+      ],
+      history_pick_keep_seat: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "tickets"
+        }
+      ],
+      history_cancel_ticket: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "tickets"
+        }
+      ]
+    }
+ *
+ * @apiErrorExample {json} lỗi
+ *  HTTP/1.1 400 Bad Request
+ *
+ *  {
+ *    password: 'password is required'
+ *  }
+ */
+
+
+export async function _getHistoryExchange(req, res, next) {
+  try {
+    const _idClient = req.user._id;
+    const clientWithHistory = await Client.findById(_idClient)
+      .populate("acount_payment.history_transaction")
+      .populate("acount_payment.history_pick_keep_seat")
+      .populate("acount_payment.history_cancel_ticket");
+    return res
+      .status(HTTPStatus.OK)
+      .json({ err: false, result: clientWithHistory });
+  } catch (err) {
+    err.status = HTTPStatus.BAD_REQUEST;
+    return next(err);
+  }
+}
