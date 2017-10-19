@@ -12,7 +12,7 @@ export const validation = {
         .email()
         .required(),
       password: Joi.string()
-        .min(6)
+        .regex(/^[a-zA-Z0-9]{3,30}$/)
         .required()
     }
   },
@@ -44,10 +44,8 @@ export const validation = {
  * @param {function} next 
  */
 export async function _postLogin(req, res, next) {
-  res
-    .status(HTTPStatus.CONTINUE)
-    .json({ err: false, result: req.user.toAuthJSON() });
-  next();
+  res.status(HTTPStatus.OK).json(req.user.toAuthJSON());
+  return next();
 }
 
 /* ====================================================================================================================================================================== */
@@ -132,3 +130,30 @@ export async function _postUpdatePass(req, res, next) {
 //     }
 
 // }
+/* ====================================================================================================================================================================== */
+
+export async function testCreateUser(req, res, next) {
+  try {
+    const user = {
+      info: {
+        lastname: req.body.lastname,
+        firstname: req.body.firstname,
+        phone: req.body.phone,
+        dateofbirth: req.body.dateofbirth,
+        passport: req.body.passport,
+        gender: req.body.gender,
+        address: req.body.address
+      },
+      email: req.body.email,
+      password: req.body.password,
+      username: req.body.username,
+      role: req.body.role
+    };
+    return res
+      .status(HTTPStatus.OK)
+      .json({ err: false, result: await UserModel.create(user) });
+  } catch (err) {
+    err.status = HTTPStatus.BAD_REQUEST;
+    return next(err);
+  }
+}

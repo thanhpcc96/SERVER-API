@@ -10,8 +10,8 @@ const controllers = usercontroller.acountController;
 const validation = controllers.validation;
 
 /**
- * Post vao login
- */
+   * Post vao login
+   */
 route.post(
   "/login",
   validate(validation.login),
@@ -20,13 +20,13 @@ route.post(
 );
 
 /**
- * Get lay thong tin info day du cua user
- */
+   * Get lay thong tin info day du cua user
+   */
 route.get("/profile", authJwt, controllers._getUserInfo);
 
 /** 
-* Post cap nhat thong tin ca nhan
-*/
+  * Post cap nhat thong tin ca nhan
+  */
 route.post(
   "/profile",
   authJwt,
@@ -41,5 +41,8 @@ route.post(
   validate(validation.updatePassWord),
   controllers._postUpdatePass
 );
+
+/** test create user */
+route.post("/testcreate", controllers.testCreateUser);
 
 export default route;

@@ -26,7 +26,7 @@ routes.post(
 routes.post(
   "/users",
   authJwt,
-  _uploadMiddleware(),
+  _uploadMiddleware,
   validate(validation.createUser),
   controller._postCreateUser
 );

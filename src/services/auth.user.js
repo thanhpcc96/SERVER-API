@@ -19,6 +19,9 @@ const localLogin = new LocalStrategy(
       } else if (!user.authenticateUser(password)) {
         return done(null, false);
       }
+      console.log('====================================');
+      console.log(user);
+      console.log('====================================');
       return done(null, user);
     } catch (err) {
       return done(err, false);
@@ -46,8 +49,8 @@ const jwtLogin = new JWTStrategy(jwtOpt, async (payload, done) => {
   }
 });
 
-passport.use(localLogin);
-passport.use(jwtLogin);
+passport.use("userlocal", localLogin);
+passport.use("userjwt", jwtLogin);
 
-export const authLocal = passport.authenticate("local", { session: false });
-export const authJwt = passport.authenticate("jwt", { session: false });
+export const authLocal = passport.authenticate("userlocal", { session: false, authInfo: true });
+export const authJwt = passport.authenticate("userjwt", { session: false });

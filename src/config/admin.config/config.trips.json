@@ -1,4 +1,6 @@
 {
-    "timetostart":"6:00,9:00,12:00,15:00,17:00,19:00",
-    "soxethamgia":"12"
+    "timetostart":"6", // 6h khoi hanh
+    "timetoend":"17", // 17h ket thuc
+    "tanxuat":"30", // 30 phut 1chuyen
+    "chongoi": "40"
 }
