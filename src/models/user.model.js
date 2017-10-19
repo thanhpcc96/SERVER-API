@@ -45,6 +45,13 @@ const UserSchema = new Schema({
             required: [true, 'Last name is required'],
             trim: true
         },
+        dateofbirth:{
+            type: Date,
+        },
+        gender:{
+            type: String,
+            default: 'KHAC'
+        },
         address: {
             type: String,
             trim: true
@@ -70,7 +77,7 @@ const UserSchema = new Schema({
         type: Date
     },
     role: {
-        type: Number, // 1 la nhan vien phu xe, 2 lai xe, 3 nhan vien giam sat, 4 nhan vien kiem toan, 5 quan ly
+        type: Number, // 1 Quan ly, 2 lai xe & phu xe,  3 nhan vien giam sat
         default: 1
     },
     status: String // ACTIVE, DEACTIVE, SUSPENDED

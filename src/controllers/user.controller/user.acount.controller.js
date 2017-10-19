@@ -1,47 +1,125 @@
-import HTTPStatus from 'http-status';
-import UserModel from '../../models/user.model';
+import HTTPStatus from "http-status";
+import Joi from "joi";
+
+import UserModel from "../../models/user.model";
+import constants from "../../config/constants";
+import { filteredBody } from "../../ultils/filterBody";
+
+export const validation = {
+  login: {
+    body: {
+      email: Joi.string()
+        .email()
+        .required(),
+      password: Joi.string()
+        .min(6)
+        .required()
+    }
+  },
+  updateInfo: {
+    body: {
+      firstname: Joi.string(),
+      lastname: Joi.string(),
+      address: Joi.string(),
+      dateofbirth: Joi.date(),
+      phone: Joi.string().regex(/^[0-9-+]+$/)
+    }
+  },
+  updatePassWord: {
+    body: {
+      password: Joi.string()
+        .min(6)
+        .required(),
+      newpassword: Joi.string()
+        .min(6)
+        .required()
+    }
+  }
+};
+
 /**
  * Hàm post Login sử dụng authencation
  * @param {Object} req 
  * @param {Object} res 
  * @param {function} next 
  */
-export function _postLogin(req, res, next) {
-    res.status(HTTPStatus.CONTINUE).json({ err: false, result: req.user.toAuthJSON() });
-    next();
+export async function _postLogin(req, res, next) {
+  res
+    .status(HTTPStatus.CONTINUE)
+    .json({ err: false, result: req.user.toAuthJSON() });
+  next();
 }
+
+/* ====================================================================================================================================================================== */
+
 /**
  * Ham get du lieu ve cua 1 user ve
  * @param {*} req 
  * @param {*} res 
  */
-export async function _getUserInfo(req, res) {
-    try {
-        return res.status(HTTPStatus.OK).json({ err: fasle, result: await UserModel.findById(req.user._id) });
-    } catch (err) {
-        return res.status(HTTPStatus.BAD_REQUEST).json({err: true, message: "Loi phat sinh"});
-    }
+export async function _getUserInfo(req, res, next) {
+  try {
+    return res
+      .status(HTTPStatus.OK)
+      .json({ err: false, result: await UserModel.findById(req.user._id) });
+  } catch (err) {
+    err.status = HTTPStatus.BAD_REQUEST;
+    return next(err);
+  }
 }
 
+/* ====================================================================================================================================================================== */
 
 /**
  * Ham update thong tin user
  * @param {Object} req 
  * @param {Object} res 
  */
-export async function _postUpdateInfo(req, res) {
-    try {
-        const id = req.user._id;
-        const userCurrent = await UserModel.findById(id);
-        userCurrent.password = req.body.password;
-        userCurrent.info.firtname = userCurrent.info.firtname || req.body.firtname;
-        userCurrent.info.lastname = userCurrent.info.lastname || req.body.lastname;
-        userCurrent.info.address = userCurrent.info.address || req.body.address;
-        res.status(HTTPStatus.OK).json({ err: false, result: await userCurrent.save() });
-    } catch (err) {
-        return res.status(HTTPStatus.BAD_REQUEST).json({ err: true, message: 'Loi he thong ' + err });
-    }
+export async function _postUpdateInfo(req, res, next) {
+  const body = filteredBody(req.body, constants.WHITELIST.manager.updateInfo);
+  try {
+    const id = req.user._id;
+    const userCurrent = await UserModel.findById(id);
+    userCurrent.info.firtname = body.firtname || userCurrent.info.firtname;
+    userCurrent.info.lastname = body.lastname || userCurrent.info.lastname;
+    userCurrent.info.address = body.address || userCurrent.info.address;
+    userCurrent.info.dateofbirth =
+      body.dateofbirth || userCurrent.info.dateofbirth;
+    userCurrent.info.phone = body.phone || userCurrent.info.phone;
+    res
+      .status(HTTPStatus.OK)
+      .json({ err: false, result: await userCurrent.save() });
+  } catch (err) {
+    err.status = HTTPStatus.BAD_REQUEST;
+    return next(err);
+  }
 }
+
+/* ====================================================================================================================================================================== */
+
+export async function _postUpdatePass(req, res, next) {
+  const body = filteredBody(
+    req.body,
+    constants.WHITELIST.manager.updatePassWord
+  );
+  try {
+    const idUser = req.user._id;
+    const userCurrent = await UserModel.findById(idUser);
+    if (!userCurrent.authenticateUser(body.password)) {
+      return res
+        .status(HTTPStatus.NON_AUTHORITATIVE_INFORMATION)
+        .json({ err: true, message: "Mat khau cu khong trung khop" });
+    }
+    userCurrent.password = body.newpassword;
+    return res
+      .status(HTTPStatus.OK)
+      .json({ err: false, result: await userCurrent.save() });
+  } catch (err) {
+    err.status = HTTPStatus.BAD_REQUEST;
+    return next(err);
+  }
+}
+
 // export function _postDangKiLichLamViec(req, res, next) {
 //     try {
 //         const user = req.user;

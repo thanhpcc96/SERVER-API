@@ -3,7 +3,7 @@ import multer, { diskStorage } from 'multer';
 /**
  * Config upload for userImg
  */
-const _uploadMiddleware = () => {
+export const _uploadMiddleware = () => {
     const store = diskStorage({
         destination: (req, file, cb) => {
             cb(null, 'public/img/') //"dist/upload/"
