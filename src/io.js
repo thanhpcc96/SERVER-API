@@ -21,12 +21,17 @@ io.adapter(adapter({ pubClient, subClient }));
  * Chắc không! haha đã pubsub rồi bắn store làm mẹ gì? are you ok?
  */
 
-
 /**
  *  Them cac io event client
  */
 clientSocket(io);
-
-
+const sl = [];
+io.on('connection', socket => {
+  sl.push(socket);
+  console.log('===============================');
+  console.log('Vao dk scoket');
+  console.log('===============================');
+});
+io.emit('online', sl);
 
 export default io;

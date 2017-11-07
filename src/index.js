@@ -36,7 +36,7 @@ middlewareConfig(app);
 
 app.use("/jobs", Agendash(agenda));
 //thiey lap static path
-app.use(express.static(path.join(__dirname, "public")));
+app.use('/public',express.static(path.join(__dirname, "public")));
 
 // thiet lap router cho ung dung
 app.use('/api/v1', ApiRoutes);

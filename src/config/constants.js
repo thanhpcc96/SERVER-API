@@ -11,7 +11,7 @@ const WHITELIST = {
     rechairCoin: ["idclient","amount"],
   },
   client: {
-    register: ["firstname", "lastname", "phone", "email", "password"],
+    register: ["fullname", "phone", "email", "password"],
     resetPassword: ["email"],
     updateInfo: ["firstname", "lastname", "phone", "email", "address"],
     updatePassWord: ["password", "newpassword"]

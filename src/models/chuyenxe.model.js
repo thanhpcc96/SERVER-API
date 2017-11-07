@@ -47,7 +47,25 @@ const chuyen = new Schema({
     loai: {
         type: String, // di ve ve
         default: "DI"
+    },
+    danhgia:[
+      {
+        khachhang:{
+          type: Schema.Types.ObjectId,
+          ref:'clients'
+        },
+        comment: {
+            type: String
+        }
+      }
+    ],
+    vote:{
+      namsao:Number,
+      bonsao:Number,
+      basao:Number,
+      haisao:Number,
+      motsao:Number,
     }
-}, { timestamps: true });
+  }, { timestamps: true });
 
 export default mongoose.model('chuyen', chuyen);

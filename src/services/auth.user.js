@@ -19,9 +19,6 @@ const localLogin = new LocalStrategy(
       } else if (!user.authenticateUser(password)) {
         return done(null, false);
       }
-      console.log('====================================');
-      console.log(user);
-      console.log('====================================');
       return done(null, user);
     } catch (err) {
       return done(err, false);

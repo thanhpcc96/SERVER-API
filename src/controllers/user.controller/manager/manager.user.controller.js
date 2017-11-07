@@ -39,10 +39,10 @@ export const validation = {
 
 /**
  * Hàm thực hiện load danh sách user
- * Chỉ quản lý nhân sự và Người có quyên cao hơn được phép 
+ * Chỉ quản lý nhân sự và Người có quyên cao hơn được phép
  * Thực hiện quyền này
- * @param {Object} req 
- * @param {Object} res 
+ * @param {Object} req
+ * @param {Object} res
  */
 export async function _getAllUser(req, res, next) {
   try {
@@ -69,8 +69,8 @@ export async function _getAllUser(req, res, next) {
  * Hàm thực hiện xóa nhân viên
  * Chỉ cho phép xóa từng người
  * Chỉ có quản lý nhân sự và admin được xóa
- * @param {Object} req 
- * @param {Object} res 
+ * @param {Object} req
+ * @param {Object} res
  */
 export async function _deleteUser(req, res, next) {
   const body = filteredBody(req.body, constants.WHITELIST.manager.deleteUser);
@@ -98,8 +98,8 @@ export async function _deleteUser(req, res, next) {
 }
 /**
  * HÀM tạo 1 user mới có sử dụng upload file
- * @param {Object} req 
- * @param {Object} res 
+ * @param {Object} req
+ * @param {Object} res
  */
 export async function _postCreateUser(req, res, next) {
   const body = filteredBody(req.body, constants.WHITELIST.manager.createUser);
@@ -129,23 +129,35 @@ export async function _postCreateUser(req, res, next) {
       role: body.role > 1 ? body.role : 3,
       status: "ACTIVE"
     };
-    if (req.file) {
-      req.file.forEach(file => {
-        const filename = file.originalname + new Date().valueOf();
-        fs.rename(
-          file.path,
-          path.join(__dirname, `public/img/user/${filename}`, err => {
-            if (err) throw err;
-            filterToData.info.photoProfile.push(filename);
-          })
-        );
-      });
-    }
     return res
       .status(HTTPStatus.CREATED)
       .json({ err: false, result: await User.create(filterToData) });
   } catch (err) {
-    err.status(HTTPStatus.BAD_REQUEST);
+    err.status = HTTPStatus.BAD_REQUEST;
     return next(err);
   }
+}
+/* ====================================================================================================================================================================== */
+
+export function uploadPhotoProfile(req, res, next) {
+  if (req.file) {
+    console.log(
+      "===================================================================================="
+    );
+    console.log(req.file);
+    console.log(
+      "===================================================================================="
+    );
+    req.file.forEach(f => {
+      const filename = f.originalname + new Date().valueOf();
+      fs.rename(
+        f.path,
+        path.join(__dirname, `public/img/user/${filename}`, err => {
+          if (err) throw err;
+          // filterToData.info.photoProfile.push(filename);
+        })
+      );
+    });
+  }
+  next();
 }

@@ -1,19 +1,19 @@
-import passport from "passport";
-import LocalStrategy from "passport-local";
-import { Strategy as JWTStrategy, ExtractJwt } from "passport-jwt";
+import passport from 'passport';
+import LocalStrategy from 'passport-local';
+import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt';
 
-import Client from "../models/client.model";
-import constants from "../config/constants";
+import Client from '../models/client.model';
+import constants from '../config/constants';
 
 /*
 *Xac thuc local
 */
-const localOpt = { usernameField: "email" };
+const localOpt = { usernameField: 'email' };
 const localLogin = new LocalStrategy(
   localOpt,
   async (email, password, done) => {
     try {
-      const client = await Client.findOne({ "local.email": email });
+      const client = await Client.findOne({ 'local.email': email });
       if (!client) {
         return done(null, false);
       } else if (!client.authenticateClientUser(password)) {
@@ -23,15 +23,15 @@ const localLogin = new LocalStrategy(
     } catch (err) {
       return done(err, false);
     }
-  }
+  },
 );
 /*
 * JWT Strategy Auth
 */
 const jwtOpt = {
   // lay token tu auth tu header for JWT
-  jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme("JWT"),
-  secretOrKey: constants.JWT_SECRET
+  jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('JWT'),
+  secretOrKey: constants.JWT_SECRET,
 };
 
 const jwtLogin = new JWTStrategy(jwtOpt, async (payload, done) => {
@@ -46,10 +46,8 @@ const jwtLogin = new JWTStrategy(jwtOpt, async (payload, done) => {
   }
 });
 
-passport.use("clientlocal", localLogin);
-passport.use("clientjwt", jwtLogin);
+passport.use('clientlocal', localLogin);
+passport.use('clientjwt', jwtLogin);
 
-export const authLocal = passport.authenticate("clientlocal", {
-  session: false
-});
-export const authJwt = passport.authenticate("clientjwt", { session: false });
+export const authLocal = passport.authenticate('clientlocal',{ session: false, authInfo: true });
+export const authJwt = passport.authenticate('clientjwt', { session: false });

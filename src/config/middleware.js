@@ -18,8 +18,8 @@ const isDev = process.env.NODE_ENV === 'development';
 
 export default app => {
     app.use(compression());
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(bodyParser.json({limit:'10mb'}));
+    app.use(bodyParser.urlencoded({ extended: true ,limit: '10mb', parameterLimit:50000}));
     app.use(passport.initialize());
     app.use(helmet());
     app.use(cors());

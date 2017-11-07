@@ -3,7 +3,7 @@ import validate from "express-validation";
 
 import { usercontroller } from "../../controllers";
 import { authJwt } from "../../services/auth.user";
-import { _uploadMiddleware } from "../../helper/upload";
+import upload from "../../helper/upload";
 
 const controller = usercontroller.managerUser;
 const validation = controller.validation;
@@ -26,9 +26,9 @@ routes.post(
 routes.post(
   "/users",
   authJwt,
-  _uploadMiddleware,
   validate(validation.createUser),
   controller._postCreateUser
 );
+routes.post("/upload", upload.single("test"), controller.uploadPhotoProfile);
 
 export default routes;

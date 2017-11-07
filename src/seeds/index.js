@@ -1,3 +1,3 @@
-import { clientSeed } from "./user.seed";
+import { clientSeed,deleteAllClient } from "./user.seed";
 
-export { clientSeed };
+export { clientSeed, deleteAllClient };

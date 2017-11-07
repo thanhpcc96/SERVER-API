@@ -18,11 +18,6 @@ const coachSchema = new Schema({
     productiontime: { // thoi gian san xuat
         type: Date,
     },
-    kind: {
-        type: Number, // 1 xe vip, 2 xe thuong
-        required: true,
-        default: 2
-    },
     photo: {
         type: String,
         trim: true

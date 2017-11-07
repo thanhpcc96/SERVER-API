@@ -38,14 +38,8 @@ const ClientUserSchema = new Schema(
       ]
     },
     info: {
-      firstname: {
+      fullname:{
         type: String,
-        required: [true, "First name is required"],
-        trim: true
-      },
-      lastname: {
-        type: String,
-        required: [true, "Last name is required"],
         trim: true
       },
       address: {
@@ -202,11 +196,11 @@ ClientUserSchema.methods = {
    * @public
    * @returns {Object} User - ready for populate
    */
-  toJSON() {
-    return {
-      _id: this._id,
-      local: this.local
-    };
-  }
+  // toJSON() {
+  //   return {
+  //     _id: this._id,
+  //     local: this.local
+  //   };
+  // }
 };
 export default mongoose.model("clients", ClientUserSchema);

@@ -48,6 +48,10 @@ const TicketSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    isDoneCheck:{
+      type: Boolean,
+      default: false,
+    }
   },
   { timestamps: true },
 );

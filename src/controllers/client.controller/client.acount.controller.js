@@ -21,8 +21,7 @@ export const validation = {
   },
   resgiter: {
     body: {
-      firstname: Joi.string().required(),
-      lastname: Joi.string().required(),
+      fullname: Joi.string().required(),
       phone: Joi.string()
         .regex(/^[0-9-+]+$/)
         .min(10)
@@ -172,8 +171,7 @@ export async function _postRegister(req, res, next) {
     const filterToClient = {
       phone: body.phone,
       info: {
-        firstname: body.firstname,
-        lastname: body.lastname
+        fullname: body.fullname
       },
       local: {
         email: body.email,
@@ -221,13 +219,13 @@ export async function _getInfo(req, res, next) {
  * @apiSuccess {Number} status Status code phản hồi Request.
  *
  * @apiSuccessExample
- * 
- * 
+ *
+ *
  * HTTP/1.1 200 OK
  *
- * { 
- *  error: false, 
- *  message: "Vui lòng check mail" 
+ * {
+ *  error: false,
+ *  message: "Vui lòng check mail"
  * }
  *
  * @apiErrorExample {json} lỗi
@@ -317,15 +315,15 @@ export async function _postResetPassword(req, res, next) {
  * @apiSuccess {Number} status Status code phản hồi Request.
  *
  * @apiSuccessExample
- * 
- * 
+ *
+ *
  * HTTP/1.1 200 OK
  *
- * { 
- *  error: false, 
+ * {
+ *  error: false,
  *  result:{
  *        thong tin cua Khach hang sau cap nhat
- *    } 
+ *    }
  * }
  *
  * @apiErrorExample {json} lỗi
