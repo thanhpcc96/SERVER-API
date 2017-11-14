@@ -35,15 +35,8 @@ const UserSchema = new Schema({
         }
     },
     info: {
-        firstname: {
-            type: String,
-            required: [true, 'First name is required'],
-            trim: true
-        },
-        lastname: {
-            type: String,
-            required: [true, 'Last name is required'],
-            trim: true
+        fullname:{
+          type: String
         },
         dateofbirth:{
             type: Date,
@@ -77,7 +70,7 @@ const UserSchema = new Schema({
         type: Date
     },
     role: {
-        type: Number, // 1 Quan ly, 2 lai xe & phu xe,  3 nhan vien giam sat
+        type: Number, // 1 Quan ly, 2 lai xe ,3 phu xe,  4 nhan vien giam sat
         default: 1
     },
     status: String // ACTIVE, DEACTIVE, SUSPENDED
@@ -152,11 +145,11 @@ UserSchema.methods = {
    * @public
    * @returns {Object} User - ready for populate
    */
-    toJSON() {
-        return {
-            _id: this._id,
-            token: this.createToken()
-        };
-    },
+    // toJSON() {
+    //     return {
+    //         _id: this._id,
+    //         token: this.createToken()
+    //     };
+    // },
 }
 export default mongoose.model('users', UserSchema);

@@ -4,22 +4,22 @@ import validate from 'express-validation';
 import { authJwt } from '../../services/auth.user';
 import { usercontroller } from '../../controllers';
 
-const managerCoach = usercontroller.managerChuyenxe;
+const managerCoach = usercontroller.managerCoach;
 const validation = managerCoach.validation;
 
 const route = new Router();
 
-route.get('/coachs', authJwt, managerCoach.getAllCoach);
+route.get('/all', authJwt, managerCoach.getAllCoach);
 
 route.post(
-  '/coach/create',
+  '/create',
   authJwt,
   validate(validation.createCoach),
   managerCoach.createCoach,
 );
 
 route.post(
-  '/coach/delete',
+  '/delete',
   authJwt,
   validate(validation.deleteCoach),
   managerCoach.deleteCoach,

@@ -1,16 +1,15 @@
 import mongoose, { Schema } from 'mongoose';
 
 const chuyen = new Schema({
-    sochuyen: {
+    tenchuyen: {
         type: String,
-        unique: true,
     },
     timeStart: {
-        type: Schema.Types.Date,
+        type: Date,
         required: [true, 'Thoi gian khoi hanh la bat buoc']
     },
     timeEnd: { // thoi gian du kien den ben xe
-        type: Schema.Types.Date,
+        type: Date,
         required: [true, 'Thoi gian du kien ket thuc la bat buoc']
     },
     routeOfTrip: { // lộ trình của chuyến, Ví dụ: Hà nội ---> Hải Phòng
@@ -21,12 +20,14 @@ const chuyen = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'users'
     }],
-    laixevaphuxe: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: 'users'
-        }
-    ],
+    laixe:{
+      type: Schema.Types.ObjectId,
+      ref: 'users'
+    },
+    phuxe:{
+      type: Schema.Types.ObjectId,
+      ref: 'users'
+    },
     coach: {
         type: Schema.Types.ObjectId,
         ref: 'coachs'
@@ -59,12 +60,16 @@ const chuyen = new Schema({
         }
       }
     ],
+    dadat:{
+        type: Number,
+        default: 0
+    },
     vote:{
-      namsao:Number,
-      bonsao:Number,
-      basao:Number,
-      haisao:Number,
-      motsao:Number,
+      five:Number,
+      four:Number,
+      three:Number,
+      two:Number,
+      once:Number,
     }
   }, { timestamps: true });
 

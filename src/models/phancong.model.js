@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import moment from 'moment'
 
 /**
  * Theo logic thì mỗi người lái xe và phụ xe sẽ làm việc 1ngày,
@@ -7,24 +8,42 @@ import mongoose, { Schema } from "mongoose";
 const phancongSchema = new Schema({
     ngayphancong: {
         type: Date,
-        default: Date.now()
+        required: [true,'Lich la bat buoc'],
+        unique:true
     },
-    // khunggio: {
-    //     type: String, // chỉ có MORNING và hoặc AFTERNOON
-    //     default: 'MORNING'
-    // },
-    trips: {
-        type: Schema.Types.ObjectId,
-        ref: 'trips'
-    },
-    user: {
-        type: Schema.Types.ObjectId,
-        ref: 'users'
-    },
-    coach: {
-        type: Schema.Types.ObjectId,
-        ref: 'coachs'
-    }
+    taixe_phuxe:[
+      {
+        taixe:{
+          type:Schema.Types.ObjectId,
+          ref: 'users'
+        },
+        phuxe:{
+          type:Schema.Types.ObjectId,
+          ref: 'users'
+        },
+        chuyen:[
+          {
+            type: Schema.Types.ObjectId,
+            ref:'chuyen'
+          }
+        ]
+      }
+    ],
+    thanhtra:[
+        {
+          thanhtra:{
+            type: Schema.Types.ObjectId,
+            ref: 'users'
+          },
+          tuyen:{
+            type: Schema.Types.ObjectId,
+            ref: 'lotrinh'
+          },
+          vitritramkiemtra:{
+            type: String
+          }
+        }
+    ]
 },{timestamps: true});
 
 export default mongoose.model('phancong',phancongSchema);

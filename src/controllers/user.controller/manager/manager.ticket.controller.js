@@ -30,7 +30,7 @@ export async function getAllTicket(req, res, next) {
       .json({ err: false, result: await TicketModel.find() });
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
-    next(err);
+    return next(err);
   }
 }
 
@@ -52,7 +52,7 @@ export async function getTicketInfo(req, res, next) {
     return res.status(HTTPStatus.OK).json({ err: false, result: info });
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
-    next(err);
+    return next(err);
   }
 }
 
@@ -72,6 +72,6 @@ export async function tickXeVe(req, res, next) {
       .json({ err: false, result: await veCheckDuoc.save() });
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
-    next(err);
+    return next(err);
   }
 }

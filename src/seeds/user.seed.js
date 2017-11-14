@@ -1,6 +1,7 @@
 import faker from 'faker';
 
 import ClientModel from '../models/client.model';
+import UserModel from '../models/user.model';
 
 export async function clientSeed(count) {
   const clients = [];
@@ -22,6 +23,27 @@ export async function clientSeed(count) {
   });
   return await ClientModel.insertMany(clients);
 }
+export async function userSeed(role) {
+  const user = [];
+  Array.from({ length: 32 }).map(() => {
+    const fakeClient = {
+      email: faker.internet.email(),
+      username: faker.internet.userName(),
+      password:' 1234567891!',
+      info: {
+        fullname: `${faker.name.firstName()} ${faker.name.lastName()}`,
+        passportNumber: faker.random.uuid(),
+        address: `${faker.address.country('VN')} `,
+        phoneNumber:faker.phone.phoneNumber()
+      },
+      role, // phu xe
+      status: 'ACTIVE',
+    };
+    return user.push(fakeClient);
+  });
+  return await UserModel.insertMany(user);
+}
+
 export async function deleteAllClient() {
   try {
     return await ClientModel.remove();

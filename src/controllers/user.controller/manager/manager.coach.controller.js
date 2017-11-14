@@ -12,7 +12,7 @@ export const validation = {
       numberplate: Joi.string().required(),
       seat: Joi.number().required(),
       name: Joi.string(),
-      productiontime: Joi.string(),
+      productiontime: Joi.date(),
     },
   },
   updateCoach: {
@@ -20,7 +20,7 @@ export const validation = {
       idxe: Joi.string().required(),
       seat: Joi.number().required(),
       name: Joi.string(),
-      productiontime: Joi.string(),
+      productiontime: Joi.date(),
     },
   },
   deleteCoach: {
@@ -32,12 +32,13 @@ export const validation = {
 
 export async function getAllCoach(req, res, next) {
   try {
+    const kq= await CoachModel.find()
     return res
       .status(HTTPstatus.OK)
-      .json({ err: false, result: await CoachModel.find() });
+      .json({ err: false, length: kq.length , result: kq });
   } catch (err) {
     err.status = HTTPstatus.BAD_REQUEST;
-    next(err);
+    return next(err);
   }
 }
 export async function createCoach(req, res, next) {
@@ -49,7 +50,7 @@ export async function createCoach(req, res, next) {
       .json({ err: false, result: await CoachModel.create(body) });
   } catch (err) {
     err.status = HTTPstatus.BAD_REQUEST;
-    next(err);
+    return next(err);
   }
 }
 
@@ -62,7 +63,7 @@ export async function deleteCoach(req, res, next) {
       .json({ err: false, message: 'Da xoa thanh cong' });
   } catch (err) {
     err.status = HTTPstatus.BAD_REQUEST;
-    next(err);
+    return next(err);
   }
 }
 
@@ -80,6 +81,6 @@ export async function updateCoach(req, res, next) {
       .json({ err: false, result: await oldCoach.save() });
   } catch (err) {
     err.status = HTTPstatus.BAD_REQUEST;
-    next(err);
+    return next(err);
   }
 }

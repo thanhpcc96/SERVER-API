@@ -4,11 +4,10 @@ import moment from 'moment';
 import chuyenxeModel from '../models/chuyenxe.model';
 
 export default function copyGPXfile(agenda) {
-    agenda.define('copyfile', (job, done) => {
+    agenda.define('copyfile', async (job, done) => {
 
         const now = moment();
-        const arrName = [];
-        chuyenxeModel.find({
+        const arrName = await chuyenxeModel.find({
             timeStart: { $gt: now.set({ hour: 0, minute: 5 }), $lt: now.set({ hour: 20, minute: 30 }) }
         })
             .populate('routeOfTrip')
@@ -53,6 +52,6 @@ export default function copyGPXfile(agenda) {
                 });
             });
         });
-        done();
+       // return done();
     });
 }

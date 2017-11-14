@@ -12,7 +12,7 @@ const routes = new Router();
 
 /** get all user */
 
-routes.get("/users", authJwt, controller._getAllUser);
+routes.get("/all", authJwt, controller._getAllUser);
 
 /** Xoa tai khoan nhan vien */
 routes.post(

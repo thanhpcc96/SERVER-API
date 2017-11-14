@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema, Error } from "mongoose";
 
 const LotrinhSchema = new Schema(
   {
@@ -6,39 +6,52 @@ const LotrinhSchema = new Schema(
       // lộ trình của chuyến, Ví dụ: Hà nội ---> Hải Phòng
       from: {
         type: String,
-        required: [true, 'Diem xuat phat la bat buoc'],
+        required: [true, "Diem xuat phat la bat buoc"]
       },
       to: {
         type: String,
-        required: [true, 'Diem den cung phai bat buoc'],
+        required: [true, "Diem den cung phai bat buoc"]
       },
       lotrinh: [
         {
-          type: String,
-        },
-      ],
+          type: String
+        }
+      ]
     },
     thoigianvanchuyen: {
       type: Number,
       default: 1,
-      min: 0,
+      min: 0
     },
     vitriChotKT: [
       {
-        type: String, // địa phận , vị trí của chốt kiểm tra
-      },
+        type: String // địa phận , vị trí của chốt kiểm tra
+      }
     ],
     gpxFileName: {
-      type: String,
+      type: String
     },
     xetronglotrinh: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'coachs',
-      },
-    ],
+        ref: "coachs"
+      }
+    ]
   },
-  { timestamps: true },
+  { timestamps: true }
 );
-
-export default mongoose.model('lotrinh', LotrinhSchema);
+LotrinhSchema.index({ 'routeOfTrip.from': "text", 'routeOfTrip.end': "text", 'routeOfTrip.lotrinh': "text" });
+LotrinhSchema.pre("save", function(next) {
+  if (this.isModified("xetronglotrinh")) {
+    if (this.xetronglotrinh.length < this.thoigianvanchuyen * 4) {
+      return next(
+        new Error(
+          `so luong xe tham gia trong chuyen khong du toi thieu ${this
+            .thoigianvanchuyen * 4}`
+        )
+      );
+    }
+  }
+  return next();
+});
+export default mongoose.model("lotrinh", LotrinhSchema);

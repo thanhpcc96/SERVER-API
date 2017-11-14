@@ -1,3 +1,15 @@
-import { clientSeed,deleteAllClient } from "./user.seed";
+import { clientSeed, deleteAllClient,userSeed } from './user.seed';
+import {
+  createChuyenXeSeed,
+  deleteAllChuyen,
+  generateChuyenInDay,
+} from './chuyenxe.seed';
 
-export { clientSeed, deleteAllClient };
+export {
+  userSeed,
+  clientSeed,
+  deleteAllClient,
+  createChuyenXeSeed,
+  deleteAllChuyen,
+  generateChuyenInDay,
+};

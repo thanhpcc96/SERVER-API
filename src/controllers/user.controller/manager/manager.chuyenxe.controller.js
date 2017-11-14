@@ -19,15 +19,15 @@ export async function getAllChuyen(req, res, next) {
         .json({ err: true, message: 'Ban khong co quyen' });
     }
     const result = await ChuyenxeModel.find();
-    if (result) {
+    if (!result) {
       return res
         .status(HTTPStatus.NOT_FOUND)
         .json({ err: true, message: 'Khong co ket qua' });
     }
-    return res.status(HTTPStatus.OK).json({ err: false, result });
+    return res.status(HTTPStatus.OK).json({ err: false, lenght:result.length, result });
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
-    next(err);
+    return next(err);
   }
 }
 
@@ -49,6 +49,6 @@ export async function getFullInfoChuyen(req, res, next) {
     return res.status(HTTPStatus.OK).json({ err: false, result: ketqua });
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
-    next(err);
+    return next(err);
   }
 }

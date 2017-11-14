@@ -53,7 +53,7 @@ export async function _getAllUser(req, res, next) {
         message: "Bạn không có quyền truy cập chức năng này"
       });
     }
-    const listUser = await User.find({ role: { $gt: 2 } });
+    const listUser = await User.find({ role: { $gt: 1 } });
     if (!listUser) {
       return res
         .status(HTTPStatus.NOT_FOUND)
@@ -126,7 +126,7 @@ export async function _postCreateUser(req, res, next) {
         phoneNumber: body.phone,
         photoProfile: []
       },
-      role: body.role > 1 ? body.role : 3,
+      role: body.role, // body.role > 1 ? body.role : 3,
       status: "ACTIVE"
     };
     return res
@@ -159,5 +159,5 @@ export function uploadPhotoProfile(req, res, next) {
       );
     });
   }
-  next();
+  return next();
 }
