@@ -503,3 +503,22 @@ export async function _getHistoryExchange(req, res, next) {
     return next(err);
   }
 }
+
+/* ====================================================================================================================================================================== */
+
+export async function uploadAvatar(req, res, next){
+  try {
+      const clientID= req.user._id;
+      console.log('====================================');
+      console.log(req.file);
+      console.log('====================================');
+      if(!req.file){
+        return res.status(HTTPStatus.BAD_REQUEST).json({err: true, message: 'Koi roi'});
+      }
+      return res.status(HTTPStatus.OK).json({err: false, result: await Client.findByIdAndUpdate(clientID,{ "local.photo": req.file.location}, { new : true })});
+
+  } catch (err) {
+    err.status= HTTPStatus.BAD_REQUEST;
+    return next(err);
+  }
+}

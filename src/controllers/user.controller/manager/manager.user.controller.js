@@ -140,25 +140,22 @@ export async function _postCreateUser(req, res, next) {
 /* ====================================================================================================================================================================== */
 
 export function uploadPhotoProfile(req, res, next) {
-  if (req.file) {
-    console.log(
-      "===================================================================================="
-    );
-    console.log(req.file);
-    console.log(
-      "===================================================================================="
-    );
-    // req.file.forEach(f => {
-    //   const filename = f.originalname + new Date().valueOf();
-    //   fs.rename(
-    //     f.path,
-    //     path.join(__dirname, `public/img/user/${filename}`, err => {
-    //       if (err) throw err;
-    //       // filterToData.info.photoProfile.push(filename);
-    //     })
-    //   );
-    // });
-    res.send(file.originalname)
+  try {
+    const idUser= req.body.idUser;
+    if(!req.files){
+      return res.status(HTTPStatus.BAD_REQUEST).json({err: true, message: ' Loi roi'});
+    }
+    req.files.forEach( async file =>{
+      await User.findByIdAndUpdate(idUser,
+        {
+          $push: { "info.photoProfile": file.location}
+        },
+        { new: true });
+    });
+     return res.status(200).json({err: false, message: 'Upload thanh cong'});
+  } catch (err) {
+    err.status=HTTPStatus.BAD_GATEWAY;
+    return next(err);
   }
-  return next();
+  
 }

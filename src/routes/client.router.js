@@ -3,6 +3,7 @@ import validate from "express-validation";
 
 import { authLocal, authJwt } from "../services/auth.client";
 import { clientControler } from "../controllers";
+import upload from '../helper/upload';
 
 const route = new Router();
 
@@ -45,6 +46,8 @@ route.post(
   validate(validation.updateInfo),
   clientControler.acountClientController._postUpdateInfo
 );
+
+route.post('/upload',authJwt,upload.single('avatar'), clientControler.acountClientController.uploadAvatar)
 
 /** Update mật khẩu */
 route.post(
