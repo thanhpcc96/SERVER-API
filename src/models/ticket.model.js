@@ -31,10 +31,6 @@ const TicketSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'clients',
     },
-    coupon: {
-      type: Schema.Types.ObjectId,
-      ref: 'coupons',
-    },
     isAvaiable: {
       // Ve nay co bi huy khong? true hoac false // true la bi huy ve
       type: Boolean,
@@ -93,7 +89,7 @@ TicketSchema.static = {
      * @param {ClientID} client
      */
   createTicket(arg, client) {
-    return this.createTicket({
+    return this.create({
       ...arg,
       Customer: client,
     });

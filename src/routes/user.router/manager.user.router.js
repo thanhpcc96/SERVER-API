@@ -29,6 +29,6 @@ routes.post(
   validate(validation.createUser),
   controller._postCreateUser
 );
-routes.post("/upload", upload.single("test"), controller.uploadPhotoProfile);
+routes.post("/upload", upload.array('profile',2), controller.uploadPhotoProfile);
 
 export default routes;

@@ -148,16 +148,17 @@ export function uploadPhotoProfile(req, res, next) {
     console.log(
       "===================================================================================="
     );
-    req.file.forEach(f => {
-      const filename = f.originalname + new Date().valueOf();
-      fs.rename(
-        f.path,
-        path.join(__dirname, `public/img/user/${filename}`, err => {
-          if (err) throw err;
-          // filterToData.info.photoProfile.push(filename);
-        })
-      );
-    });
+    // req.file.forEach(f => {
+    //   const filename = f.originalname + new Date().valueOf();
+    //   fs.rename(
+    //     f.path,
+    //     path.join(__dirname, `public/img/user/${filename}`, err => {
+    //       if (err) throw err;
+    //       // filterToData.info.photoProfile.push(filename);
+    //     })
+    //   );
+    // });
+    res.send(file.originalname)
   }
   return next();
 }

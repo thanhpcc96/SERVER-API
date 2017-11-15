@@ -38,21 +38,36 @@ export const clientSocket = io => {
       console.log("===============================");
       try {
         if (listchuyen.length > 0) {
-          socket.emit("updateListChuyenxe", { type: "GET_LIST_CHUYEN_SUCCESS", listchuyen});
+          socket.emit("updateListChuyenxe", {
+            type: "GET_LIST_CHUYEN_SUCCESS",
+            listchuyen
+          });
         }
         const result = await chuyenxeModel
           .find({
-            timeStart: { 
+            timeStart: {
               $lte: momment(),
-              $gt: momment().add(1, "day").set({ hour: 7, minute: 0})
+              $gt: momment()
+                .add(1, "day")
+                .set({ hour: 7, minute: 0 })
             }
           })
           .populate("routeOfTrip", "routeOfTrip.lotrinh");
         if (!result) {
-          socket.emit("updateListChuyenxe", { type: "GET_LIST_CHUYEN_ERR", err: "Khong load duoc" });
+          socket.emit("updateListChuyenxe", {
+            type: "GET_LIST_CHUYEN_ERR",
+            err: "Khong load duoc"
+          });
         }
         listchuyen = result;
-        socket.emit("updateListChuyenxe", { type: "GET_LIST_CHUYEN_SUCCESS", result });
+        socket.emit("updateListChuyenxe", {
+          type: "GET_LIST_CHUYEN_SUCCESS",
+          result
+        });
+        socket.broadcast.emit("updateListChuyenxe", {
+          type: "GET_LIST_CHUYEN_SUCCESS",
+          result
+        });
       } catch (err) {
         socket.emit("updateListChuyenxe", { type: "GET_LIST_CHUYEN_ERR", err });
       }
@@ -60,90 +75,93 @@ export const clientSocket = io => {
     /** Tìm kiếm chuyến xe */
     socket.on("timkiem", query => {
       try {
-        if( listchuyen.length == 0 ){
+        if (listchuyen.length == 0) {
           const resultStream = chuyenxeModel
-          .find({
-            timeStart: { 
-              $lte: query.timeStart || momment(),
-              $gt: momment().add(1, "day").set({ hour: 7, minute: 0})
-            },
-          }).populate({
-            path: "routeOfTrip",
-            select:  'routeOfTrip',
-            options: {
-              $text: { $search: query.textSearch }
-            }
-          }).stream();
-          /** http://mongoosejs.com/docs/api.html#querystream_QueryStream */
-          resultStream.on('data', chuyens =>{
-            socket.emit('resultSearch',{ type: "RESULT_SEARCH_SUCCESS", chuyens});
-          })
-          .on('error', err =>{
-            socket.emit('resultSearch',{ type: 'RESULT_SEARCH_ERROR', err });
-          });
-        }
-        /** sử dụng regex của javascript để tìm kiếm gần đúng  */
-        const userRegex=  new RegExp(query.textSearch,'gi');
-        const kqSearch =[];
-        listchuyen.forEach(chuyen =>{
-            chuyen.routeOfTrip.routeOfTrip.lotrinh.forEach(lotrinh=>{
-              if(lotrinh.search(userRegex) != -1 ){
-                  kqSearch.push(chuyen);
+            .find({
+              timeStart: {
+                $lte: query.timeStart || momment(),
+                $gt: momment()
+                  .add(1, "day")
+                  .set({ hour: 7, minute: 0 })
               }
             })
-        })
-       socket.emit("resultSearch",{ type: "RESULT_SEARCH_SUCCESS", kqSearch})
+            .populate({
+              path: "routeOfTrip",
+              select: "routeOfTrip",
+              options: {
+                $text: { $search: query.textSearch }
+              }
+            })
+            .stream();
+          /** http://mongoosejs.com/docs/api.html#querystream_QueryStream */
+          resultStream
+            .on("data", chuyens => {
+              socket.emit("resultSearch", {
+                type: "RESULT_SEARCH_SUCCESS",
+                chuyens
+              });
+            })
+            .on("error", err => {
+              socket.emit("resultSearch", { type: "RESULT_SEARCH_ERROR", err });
+            });
+          return;
+        }
+        /** sử dụng regex của javascript để tìm kiếm gần đúng  */
+        const userRegex = new RegExp(query.textSearch, "gi");
+        const kqSearch = [];
+        listchuyen.forEach(chuyen => {
+          chuyen.routeOfTrip.routeOfTrip.lotrinh.forEach(lotrinh => {
+            if (lotrinh.search(userRegex) != -1) {
+              kqSearch.push(chuyen);
+            }
+          });
+        });
+        socket.emit("resultSearch", {
+          type: "RESULT_SEARCH_SUCCESS",
+          kqSearch
+        });
       } catch (err) {
-        socket.emit('resultSearch',{ type: 'RESULT_SEARCH_ERROR', err });
+        socket.emit("resultSearch", { type: "RESULT_SEARCH_ERROR", err });
+      }
+    });
+    /** Load chi tiet chuyen */
+    socket.on("chuyenDetail", async idChuyen => {
+      try {
+        const ketqua = await chuyenxeModel
+          .findById(idChuyen)
+          .populate(
+            "laixe",
+            "info"
+          ) /** populate field laixe and select fieil info of userSchema */
+          .populate("phuxe", "info")
+          .populate("routeOfTrip", "routeOfTrip");
+        if (!ketqua) {
+          socket.emit("chuyenDetailResult", {
+            type: "CHUYEN_DETAIL_ERROR",
+            error: new Error("Khong load duoc chi tiet chuyen")
+          });
+          return;
+        }
+        socket.emit("chuyenDetailResult", {
+          type: "CHUYEN_DETAIL_SUCCESS",
+          result: ketqua
+        });
+      } catch (err) {
+        socket.emit("chuyenDetailResult", {
+          type: "CHUYEN_DETAIL_ERROR",
+          error: err
+        });
       }
     });
 
-    socket.on("laychitietchuyen", idChuyen => {
-      chuyenxeModel
-        .findById(idChuyen)
-        .populate("laixevaphuxe")
-        .exec((err, result) => {
-          if (err) {
-            console.log("===============================");
-            console.log(err);
-            console.log("===============================");
-          }
-          socket.emit("chitietchuyen", result);
-        });
-    });
-
-    socket.on("checkcoupon", code => {
-      couponModel.findOne({ code: code }, (err, result) => {
-        if (err) {
-          return;
-        }
-        if (!result) {
-          socket.emit("infoCoupon", { message: "Coupon không tồn tại" });
-        }
-        if (result.begin <= Date.now() && Date.now() <= result.end) {
-          if (result.solanDaApdung < result.solanApdung) {
-            socket.emit("infoCoupon", result);
-          } else {
-            socket.emit("infoCoupon", {
-              message: "Coupon đã được sử dụng hết"
-            });
-          }
-        } else {
-          socket.emit("infoCoupon", {
-            message: "Coupon không có hiệu lực hoặc hết hạn!"
-          });
-        }
-      });
-    });
-
-    // pick chuyen
-
-    socket.on("timlotrinh", (tu, den) => {});
+    socket.on("timlotrinh", async info => {});
     /**
          * event pick chuyen xe
          */
-    socket.on("pickchuyenxe", info => {
-      if (!info.userID) {
+
+    /** pick chuyen -- dang ki ve xe */
+    socket.on("pickchuyenxe", async info => {
+      if (!info.userid) {
         return;
       }
       const codeTicket = info.idchuyen + crypto.randomBytes(2).toString("hex");
@@ -155,78 +173,60 @@ export const clientSocket = io => {
           to: info.den
         },
         inChuyenXe: info.idchuyen,
-        Customer: info.userID,
-        isAvaiable: false
+        Customer: info.userid,
+        isAvaiable: false,
+        price: info.price
       };
-      if (info.coupon) {
-        couponModel.findOneAndUpdate(
-          { code: info.coupon },
-          { $set: { solanDaApdung: solanDaApdung + 1 } },
-          (err, coupon) => {
-            if (err) {
-              socket.emit("resultPick", {
-                message: "Có người nhanh tay hơn bạn rồi"
-              });
-              return;
-            }
-            newTicket.price =
-              info.price - coupon.giamTheoLoai * info.price / 100;
-            newTicket.coupon = coupon.code;
-          }
-        );
-      } else {
-        newTicket.price = info.price;
-        newTicket.coupon = "";
+
+      const client = ClientModel.findById(info.userID);
+      if (!client) {
+        return;
       }
-      ClientModel.findById(info.userID, (err, client) => {
-        if (err) {
-          return;
-        }
-        if (!client) {
-          return;
-        }
-        if (client.acount_payment.balance >= newTicket.price) {
-          client.acount_payment.balance =
-            client.acount_payment.balance - newTicket.price;
-          client.acount_payment.history_transaction.push(codeTicket);
-          newTicket.typeTicket = "DATVE";
-          newTicket.isPayed = true;
-        } else {
-          client.acount_payment.history_pick_keep_seat.push(codeTicket);
-          newTicket.typeTicket = "GIUCHO";
-          newTicket.isPayed = false;
-        }
-        client.save(err => {
-          if (err) {
-            socket.emit("resultPick", { message: "Đặt vé không thành công" });
-            return;
-          }
-          TicketModel.create(newTicket, (err, result) => {
-            if (err) {
-              socket.emit("resultPick", { message: "Không thể tạo vé" });
-              return;
-            }
-            chuyenxeModel.findById(info, (err, chuyenxe) => {
-              if (err) {
-                return;
-              }
-              chuyenxe.ticketsInChuyen.push(codeTicket);
-              chuyenxe.save(err => {
-                if (err) {
-                  return;
-                }
-                socket.broadcast.emit("listChuyenChanged");
-              });
-            });
-            socket.emit("resultPick", result);
-          });
-        });
-      });
-    });
-    // đang làm thì mất điện
-    socket.on("cancelChuyen", async (chuyenxeID, clientID, ticketID) => {
+      if (client.acount_payment.balance >= newTicket.price) {
+        client.acount_payment.balance =
+          client.acount_payment.balance - newTicket.price;
+        client.acount_payment.history_transaction.push(codeTicket);
+        newTicket.typeTicket = "DATVE";
+        newTicket.isPayed = true;
+      } else {
+        client.acount_payment.history_pick_keep_seat.push(codeTicket);
+        newTicket.typeTicket = "GIUCHO";
+        newTicket.isPayed = false;
+      }
       const arrPromise = await Promise.all([
-        ticketID.findById(ticketID),
+        client.save(),
+        TicketModel.createTicket(newTicket, info.userid),
+        chuyenxeModel.findByIdAndUpdate(
+          info.idchuyen,
+          {
+            $push: { ticketsInChuyen: info.idchuyen }
+          },
+          { new: true }
+        )
+      ]);
+      //const kqClientSave= arrPromise[0];
+      const kqTicketCreate = arrPromise[1];
+      //const updateChuyen= arrPromise[2];
+      if (!kqTicketCreate) {
+        socket.emit("pickResult", {
+          type: "PICK_CHUYEN_ERROR",
+          error: new Error("Loi! pick chuyen khong thanh cong")
+        });
+        return;
+      }
+      socket.emit("pickResult", {
+        type: "PICK_CHUYEN_SUCCESS",
+        result: kqTicketCreate
+      });
+      socket.broadcast.emit("listChuyenChanged");
+      listchuyen = [];
+    });
+
+    /** Cancel chuyen */
+    socket.on("cancelChuyen", async info => {
+      const { chuyenxeID, clientID, ticketID } = info;
+      const arrPromise = await Promise.all([
+        TicketModel.findById(ticketID),
         ClientModel.findById(clientID)
       ]);
       const ticketResult = arrPromise[0];
@@ -258,13 +258,19 @@ export const clientSocket = io => {
       ]);
       const clientAfterSave = arrPromiseSaved[1],
         ticketAffterSave = arrPromiseSaved[0];
-      if (!clientAfterSave || ticketAffterSave) {
-        socket.emit("cancelResult", { message: "Loi khong huy duoc ve" });
+      if (!clientAfterSave || !ticketAffterSave) {
+        socket.emit("cancelResult", {
+          type: "CANCEL_TICKET_ERROR",
+          error: new Error("Co loi xay ra, vui long thu lai")
+        });
         return;
       }
       socket.broadcast.emit("listChuyenChanged");
+      listchuyen = [];
     });
   });
+
+  // đang làm thì mất điện
   const clientTrackingIO = io.of("/tracking");
   clientTrackingIO.on("connection", socket => {
     socket.on("check", chuyenxeID => {

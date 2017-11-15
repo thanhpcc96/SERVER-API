@@ -73,4 +73,11 @@ const chuyen = new Schema({
     }
   }, { timestamps: true });
 
+  chuyen.pre('save', function (next) {
+    if (this.isModified('ticketsInChuyen')) {
+        this.dadat = this.ticketsInChuyen.length;
+    }
+    return next();
+});
+
 export default mongoose.model('chuyen', chuyen);

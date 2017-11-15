@@ -8,7 +8,7 @@ import coppyFakeGPX from './tasks/copy.gpx.file';
 const agenda = new Agenda({ db: { address: constants.MONGO_URL } });
 sendmail(agenda);
 // refeshSeat(agenda);
-coppyFakeGPX(agenda);
+//coppyFakeGPX(agenda);
 // const job = agenda.create('refeshseat', {});
 
 // job.save((err) => {
@@ -18,7 +18,7 @@ coppyFakeGPX(agenda);
 agenda.on('ready', () => {
     agenda.start();
     // agenda.schedule('12 : 00 am', 'refeshseat');
-    agenda.schedule('05 : 00 am', 'copyfile');
+   // agenda.schedule('05 : 00 am', 'copyfile');
 });
 
 

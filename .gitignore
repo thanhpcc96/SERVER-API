@@ -4,3 +4,4 @@ dist/
 .env
 coverage
 doc/
+helper/S3_config.js
