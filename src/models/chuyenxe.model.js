@@ -79,5 +79,13 @@ const chuyen = new Schema({
     }
     return next();
 });
+chuyen.statics={
+  list({ query={}, skip= 0, limit= 5 } = {}){
+      return this.find(query)
+        .skip(skip)
+        .limit(limit)
+        .populate("routeOfTrip","routeOfTrip")
+  }
+}
 
 export default mongoose.model('chuyen', chuyen);

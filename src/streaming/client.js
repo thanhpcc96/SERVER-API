@@ -18,7 +18,7 @@ export const clientSocket = io => {
     console.log("vao dk client sock");
     console.log("===============================");
     /* Biến lưu trữ mảng chuyến xe ===> khi load socket sẽ rất nhanh không cần gọi tới callback */
-    const listchuyen = [];
+    let listchuyen = [];
 
     /* Test socket */
     socket.on("test", () => {
@@ -34,7 +34,7 @@ export const clientSocket = io => {
     /* Load chuyến xe có thể đăng ký */
     socket.on("loadchuyenxe", async () => {
       console.log("===============================");
-      console.log("vaodkvaodk");
+      console.log(" on loadchuyenxe");
       console.log("===============================");
       try {
         if (listchuyen.length > 0) {
@@ -69,7 +69,7 @@ export const clientSocket = io => {
           result
         });
       } catch (err) {
-        socket.emit("updateListChuyenxe", { type: "GET_LIST_CHUYEN_ERR", err });
+        socket.emit("updateListChuyenxe", { type: "GET_LIST_CHUYEN_ERR", error: "Loi " +err });
       }
     });
     /** Tìm kiếm chuyến xe */
@@ -161,11 +161,14 @@ export const clientSocket = io => {
 
     /** pick chuyen -- dang ki ve xe */
     socket.on("pickchuyenxe", async info => {
+      console.log('===============================');
+      console.log(info);
+      console.log('===============================');
       if (!info.userid) {
         return;
       }
       const codeTicket = info.idchuyen + crypto.randomBytes(2).toString("hex");
-      const newTicket = {
+      const ticket = {
         codeTicket,
         dateOfStart: info.dateOfStart,
         routeOfTicket: {
@@ -178,24 +181,26 @@ export const clientSocket = io => {
         price: info.price
       };
 
-      const client = ClientModel.findById(info.userID);
+      const client = await ClientModel.findById(info.userid);
       if (!client) {
         return;
       }
+
+      const newTicket= await TicketModel.createTicket(ticket, info.userid);
       if (client.acount_payment.balance >= newTicket.price) {
         client.acount_payment.balance =
           client.acount_payment.balance - newTicket.price;
-        client.acount_payment.history_transaction.push(codeTicket);
+        client.acount_payment.history_transaction.push(newTicket_id);
         newTicket.typeTicket = "DATVE";
         newTicket.isPayed = true;
       } else {
-        client.acount_payment.history_pick_keep_seat.push(codeTicket);
+        client.acount_payment.history_pick_keep_seat.push(newTicket._id);
         newTicket.typeTicket = "GIUCHO";
         newTicket.isPayed = false;
       }
       const arrPromise = await Promise.all([
         client.save(),
-        TicketModel.createTicket(newTicket, info.userid),
+        newTicket.save(),
         chuyenxeModel.findByIdAndUpdate(
           info.idchuyen,
           {
@@ -219,6 +224,9 @@ export const clientSocket = io => {
         result: kqTicketCreate
       });
       socket.broadcast.emit("listChuyenChanged");
+      console.log('===============================');
+      console.log(listchuyen.length);
+      console.log('===============================');
       listchuyen = [];
     });
 

@@ -82,7 +82,7 @@ TicketSchema.methods = {
   },
 };
 
-TicketSchema.static = {
+TicketSchema.statics = {
   /**
      * Overload lai ham create model
      * @param {Object} arg
