@@ -60,7 +60,7 @@ export async function _deleteAllChuyen(req, res, next) {
 export async function _generateChuyenInDay(req, res, next) {
   try {
     await generateChuyenInDay();
-    return res.status(HTTPStatus.OK).json({res: await generateChuyenInDay()});
+    return res.status(HTTPStatus.OK).json({res: "ok"});
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
     return next(err);
