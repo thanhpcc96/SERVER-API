@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import HTTPStatus from 'http-status';
 
-import clientRoute from './client.router';
+import clientRoute from './client.router/client.account.router';
 import userAcount from './user.router/user.acount.router';
 
 import managerUser from './user.router/manager.user.router';

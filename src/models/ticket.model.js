@@ -13,6 +13,7 @@ const TicketSchema = new Schema(
     },
     dateOfStart: {
       type: Date,
+      default: Date.now()
     },
     routeOfTicket: {
       // lộ trình của vé xe: ví dụ: Hải dương---> Hà Nội thì đi xe Hà Nội--> Hải phòng

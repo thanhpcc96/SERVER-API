@@ -1,11 +1,11 @@
-import crypto from "crypto";
-import HTTPStatus from "http-status";
-import Joi from "joi";
+import crypto from 'crypto';
+import HTTPStatus from 'http-status';
+import Joi from 'joi';
 
-import { filteredBody } from "../../ultils/filterBody";
-import constants from "../../config/constants";
-import agenda from "../../jobLoader"; // config worker */
-import Client from "../../models/client.model";
+import { filteredBody } from '../../ultils/filterBody';
+import constants from '../../config/constants';
+import agenda from '../../jobLoader'; // config worker */
+import Client from '../../models/client.model';
 
 // validate Form login cho khách hàng
 export const validation = {
@@ -16,8 +16,8 @@ export const validation = {
         .required(),
       password: Joi.string()
         .regex(/^[a-zA-Z0-9]{3,30}$/)
-        .required()
-    }
+        .required(),
+    },
   },
   resgiter: {
     body: {
@@ -31,15 +31,15 @@ export const validation = {
         .required(),
       password: Joi.string()
         .regex(/^[/).regex(/^[a-zA-Z0-9]{3,30}$/)
-        .required()
-    }
+        .required(),
+    },
   },
   resetpassword: {
     body: {
       email: Joi.string()
         .email()
-        .required()
-    }
+        .required(),
+    },
   },
   updateInfo: {
     body: {
@@ -49,8 +49,8 @@ export const validation = {
         .min(10),
       firstname: Joi.string(),
       lastname: Joi.string(),
-      address: Joi.string()
-    }
+      address: Joi.string(),
+    },
   },
   updatePassWord: {
     body: {
@@ -59,9 +59,9 @@ export const validation = {
         .required(),
       newpassword: Joi.string()
         .regex(/^[/).regex(/^[a-zA-Z0-9]{3,30}$/)
-        .required()
-    }
-  }
+        .required(),
+    },
+  },
 };
 
 /* =================================================================================================================================== */
@@ -110,7 +110,7 @@ export async function _getAll(req, res) {
   } catch (err) {
     return res
       .status(HTTPStatus.BAD_REQUEST)
-      .json({ err: true, message: " Loi" });
+      .json({ err: true, message: ' Loi' });
   }
 }
 
@@ -171,13 +171,13 @@ export async function _postRegister(req, res, next) {
     const filterToClient = {
       phone: body.phone,
       info: {
-        fullname: body.fullname
+        fullname: body.fullname,
       },
       local: {
         email: body.email,
-        password: body.password
+        password: body.password,
       },
-      status: "ACTIVE"
+      status: 'ACTIVE',
     };
 
     const client = await Client.create(filterToClient);
@@ -194,9 +194,9 @@ export async function _postRegister(req, res, next) {
 
 export async function _getInfo(req, res, next) {
   try {
-    console.log("=======================================");
+    console.log('=======================================');
     console.log(req);
-    console.log("=======================================");
+    console.log('=======================================');
     const _idClient = req.user._id;
     return res
       .status(HTTPStatus.OK)
@@ -238,35 +238,59 @@ export async function _getInfo(req, res, next) {
 export async function _postResetPassword(req, res, next) {
   const body = filteredBody(req.body, constants.WHITELIST.client.resetPassword);
   try {
-    const client = await Client.findOne({ "local.email": body.email });
+    const client = await Client.findOne({ 'local.email': body.email });
     if (!client) {
       return res
         .status(HTTPStatus.NOT_FOUND)
-        .json({ error: true, message: "Tài khoản không tồn tại" });
+        .json({ error: true, message: 'Tài khoản không tồn tại' });
     }
-    const resetPasswordToken = crypto.randomBytes(16).toString("hex");
+    const resetPasswordToken = crypto.randomBytes(16).toString('hex');
     client.local.resetPasswordToken = resetPasswordToken;
     client.local.resetPasswordExpires =
       Date.now() + 18000000; /* 60*60*1000 *5/ 5 tieng */
     const mailOption = {
-      from: "Hai Au copany <services.haiaucompany@gmail.com>",
+      from: 'Hai Au copany <services.haiaucompany@gmail.com>',
       to: body.email,
-      subject: "Khôi phục mật khẩu",
+      subject: 'Khôi phục mật khẩu',
       text: ` Xin chào ${client.info.firstname} ${client.info
         .lastname}, vui lòng nhấp vào link để đặt lại mặt khẩu của bạn:
-                        http://localhost:3000/client/forgot/${resetPasswordToken}`
+                        http://localhost:3000/client/forgot/${resetPasswordToken}`,
     };
-    agenda.now("sendmail", mailOption); /* send mail Ngay lập tức */
+    agenda.now('sendmail', mailOption); /* send mail Ngay lập tức */
 
     return res
       .status(HTTPStatus.OK)
-      .json({ error: false, message: "Vui lòng check mail" });
+      .json({ error: false, message: 'Vui lòng check mail' });
   } catch (error) {
-    console.log("=====================================");
-    console.log("Lỗi ở forgot", error);
-    console.log("=====================================");
+    console.log('=====================================');
+    console.log('Lỗi ở forgot', error);
+    console.log('=====================================');
     error.status = HTTPStatus.BAD_REQUEST;
     return next(error);
+  }
+}
+export async function _postSetingNewPassword(req, res, next) {
+  try {
+    const token = req.body.token;
+    const client = await Client.findOne({
+      'local.resetPasswordToken': token.trim(),
+    });
+    if (!client) {
+      return res
+        .status(HTTPStatus.BAD_REQUEST)
+        .json({ error: true, message: 'Mã xác nhận không hợp lệ' });
+    }
+    if (client.local.resetPasswordExpires < new Date()) {
+      return res.status(HTTPStatus.LOCKED).json({
+        error: true,
+        message:"Mã xác nhận đã hết hạn ",
+      });
+    }
+    client.local.password = req.body.password;
+    return res.status(HTTPStatus.OK).json({ error: false, result: await client.save() });
+  } catch (error) {
+    error.status = HTTPStatus.BAD_REQUEST;
+    next(error);
   }
 }
 
@@ -335,9 +359,9 @@ export async function _postResetPassword(req, res, next) {
  */
 export async function _postUpdateInfo(req, res, next) {
   const body = filteredBody(req.body, constants.WHITELIST.client.updateInfo);
-  console.log("====================================");
+  console.log('====================================');
   console.log(body);
-  console.log("====================================");
+  console.log('====================================');
   try {
     // const client = await Client.findById(req.client._id);
     // if (!client) {
@@ -416,7 +440,7 @@ export async function _postUpdateInfo(req, res, next) {
 export async function _postUpdatePassword(req, res, next) {
   const body = filteredBody(
     req.body,
-    constants.WHITELIST.client.updatePassWord
+    constants.WHITELIST.client.updatePassWord,
   );
   try {
     const _idClient = req.user._id;
@@ -424,7 +448,7 @@ export async function _postUpdatePassword(req, res, next) {
     if (!client.authenticateClientUser(body.password)) {
       return res
         .status(HTTPStatus.UNAUTHORIZED)
-        .json({ err: true, message: "Mật khẩu cũ không đúng" });
+        .json({ err: true, message: 'Mật khẩu cũ không đúng' });
     }
     client.local.password = body.newpassword;
     return res
@@ -437,7 +461,6 @@ export async function _postUpdatePassword(req, res, next) {
 }
 
 /* =================================================================================================================================== */
-
 
 /**
  * @api {get} /client/profile/histoty Lấy thông tin chit tiết lịch sử giao dichj của khách hàng
@@ -487,14 +510,13 @@ export async function _postUpdatePassword(req, res, next) {
  *  }
  */
 
-
 export async function _getHistoryExchange(req, res, next) {
   try {
     const _idClient = req.user._id;
     const clientWithHistory = await Client.findById(_idClient)
-      .populate("acount_payment.history_transaction")
-      .populate("acount_payment.history_pick_keep_seat")
-      .populate("acount_payment.history_cancel_ticket");
+      .populate('acount_payment.history_transaction')
+      .populate('acount_payment.history_pick_keep_seat')
+      .populate('acount_payment.history_cancel_ticket');
     return res
       .status(HTTPStatus.OK)
       .json({ err: false, result: clientWithHistory });
@@ -506,19 +528,29 @@ export async function _getHistoryExchange(req, res, next) {
 
 /* ====================================================================================================================================================================== */
 
-export async function uploadAvatar(req, res, next){
+export async function uploadAvatar(req, res, next) {
   try {
-      const clientID= req.user._id;
-      console.log('====================================');
-      console.log(req.file);
-      console.log('====================================');
-      if(!req.file){
-        return res.status(HTTPStatus.BAD_REQUEST).json({err: true, message: 'Koi roi'});
-      }
-      return res.status(HTTPStatus.OK).json({err: false, result: await Client.findByIdAndUpdate(clientID,{ "local.photo": req.file.location}, { new : true })});
-
+    const clientID = req.user._id;
+    console.log('====================================');
+    console.log(req.file);
+    console.log('====================================');
+    if (!req.file) {
+      return res
+        .status(HTTPStatus.BAD_REQUEST)
+        .json({ err: true, message: 'Koi roi' });
+    }
+    return res
+      .status(HTTPStatus.OK)
+      .json({
+        err: false,
+        result: await Client.findByIdAndUpdate(
+          clientID,
+          { 'local.photo': req.file.location },
+          { new: true },
+        ),
+      });
   } catch (err) {
-    err.status= HTTPStatus.BAD_REQUEST;
+    err.status = HTTPStatus.BAD_REQUEST;
     return next(err);
   }
 }

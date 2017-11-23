@@ -20,14 +20,14 @@ const chuyen = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'users'
     }],
-    laixe:{
-      type: Schema.Types.ObjectId,
-      ref: 'users'
-    },
-    phuxe:{
-      type: Schema.Types.ObjectId,
-      ref: 'users'
-    },
+    // laixe:{
+    //   type: Schema.Types.ObjectId,
+    //   ref: 'users'
+    // },
+    // phuxe:{
+    //   type: Schema.Types.ObjectId,
+    //   ref: 'users'
+    // },
     coach: {
         type: Schema.Types.ObjectId,
         ref: 'coachs'
@@ -57,6 +57,10 @@ const chuyen = new Schema({
         },
         comment: {
             type: String
+        },
+        time:{
+          type: Date,
+          default: Date.now(),
         }
       }
     ],
@@ -64,13 +68,7 @@ const chuyen = new Schema({
         type: Number,
         default: 0
     },
-    vote:{
-      five:Number,
-      four:Number,
-      three:Number,
-      two:Number,
-      once:Number,
-    }
+    
   }, { timestamps: true });
 
   chuyen.pre('save', function (next) {

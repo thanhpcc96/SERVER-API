@@ -1,19 +1,19 @@
 import { Router } from "express";
 import validate from "express-validation";
 
-import { authLocal, authJwt } from "../services/auth.client";
-import { clientControler } from "../controllers";
-import upload from '../helper/upload';
+import { authLocal, authJwt } from "../../services/auth.client";
+import { acountClientController } from "../../controllers";
+import upload from '../../helper/upload';
 
 const route = new Router();
 
-const validation = clientControler.acountClientController.validation;
+const validation = acountClientController.validation;
 
 /** Đăng ký */
 route.post(
   "/register",
   validate(validation.resgiter),
-  clientControler.acountClientController._postRegister
+  acountClientController._postRegister
 );
 
 /** đăng nhập */
@@ -21,40 +21,42 @@ route.post(
   "/login",
   validate(validation.login),
   authLocal,
-  clientControler.acountClientController._postLogin
+  acountClientController._postLogin
 );
 
 /** khôi phục mật khẩu */
 route.post(
   "/forgot",
   validate(validation.resetpassword),
-  clientControler.acountClientController._postResetPassword
+  acountClientController._postResetPassword
 );
 
 /* route.post('/reset/:token',ClientController._resetPassword) */
+route.post("/reset",acountClientController._postSetingNewPassword);
+
 
 /** Test get All */
-route.get("/all", clientControler.acountClientController._getAll);
+route.get("/all", acountClientController._getAll);
 
 /** get thông tin cá nhân */
-route.get("/profile", authJwt, clientControler.acountClientController._getInfo);
+route.get("/profile", authJwt, acountClientController._getInfo);
 
 /** Update thông tin cá nhân */
 route.post(
   "/profile",
   authJwt,
   validate(validation.updateInfo),
-  clientControler.acountClientController._postUpdateInfo
+  acountClientController._postUpdateInfo
 );
 
-route.post('/upload',authJwt,upload.single('avatar'), clientControler.acountClientController.uploadAvatar)
+route.post('/upload',authJwt,upload.single('avatar'), acountClientController.uploadAvatar)
 
 /** Update mật khẩu */
 route.post(
   "/profile/password",
   authJwt,
   validate(validation.updatePassWord),
-  clientControler.acountClientController._postUpdatePassword
+  acountClientController._postUpdatePassword
 );
 
 /** get thông tin lịch sử giao dịch */

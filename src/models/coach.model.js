@@ -21,6 +21,16 @@ const coachSchema = new Schema({
     photo: {
         type: String,
         trim: true
+    },
+    phutrach:{
+      laixe: {
+        type: Schema.Types.ObjectId,
+        ref: 'users',
+      },
+      phuxe:{
+        type: Schema.Types.ObjectId,
+        ref: 'users'
+      }
     }
 }, { timestamps: true });
 
