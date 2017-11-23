@@ -2,6 +2,7 @@ import { Router } from 'express';
 import HTTPStatus from 'http-status';
 
 import clientRoute from './client.router/client.account.router';
+import clientInteractRoute from './client.router/client.interact.router'
 import userAcount from './user.router/user.acount.router';
 
 import managerUser from './user.router/manager.user.router';
@@ -19,7 +20,14 @@ import logErrorService from '../services/log';
 
 const routes = new Router();
 
+/**
+ * Route danh cho khach hang tuong tac voi tai khoan
+ */
 routes.use('/client', clientRoute);
+/**
+ * Tuong tac cua khac hang voi he thong
+ */
+routes.use('/client/interact/', clientInteractRoute);
 
 routes.use('/user', userAcount);
 /**

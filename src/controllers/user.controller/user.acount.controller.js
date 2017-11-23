@@ -4,6 +4,7 @@ import Joi from "joi";
 import UserModel from "../../models/user.model";
 import constants from "../../config/constants";
 import { filteredBody } from "../../ultils/filterBody";
+import agenda from '../../jobLoader'
 
 export const validation = {
   login: {
@@ -39,9 +40,9 @@ export const validation = {
 
 /**
  * Hàm post Login sử dụng authencation
- * @param {Object} req 
- * @param {Object} res 
- * @param {function} next 
+ * @param {Object} req
+ * @param {Object} res
+ * @param {function} next
  */
 export async function _postLogin(req, res, next) {
   res.status(HTTPStatus.OK).json(req.user.toAuthJSON());
@@ -52,8 +53,8 @@ export async function _postLogin(req, res, next) {
 
 /**
  * Ham get du lieu ve cua 1 user ve
- * @param {*} req 
- * @param {*} res 
+ * @param {*} req
+ * @param {*} res
  */
 export async function _getUserInfo(req, res, next) {
   try {
@@ -70,13 +71,16 @@ export async function _getUserInfo(req, res, next) {
 
 /**
  * Ham update thong tin user
- * @param {Object} req 
- * @param {Object} res 
+ * @param {Object} req
+ * @param {Object} res
  */
 export async function _postUpdateInfo(req, res, next) {
   const body = filteredBody(req.body, constants.WHITELIST.manager.updateInfo);
   try {
     const id = req.user._id;
+    if(req.user.role !== 1){
+      return res.status(HTTPStatus.BAD_REQUEST).json({ err: true, message: " Ban khong du quyen de thay doi thong tin"});
+    }
     const userCurrent = await UserModel.findById(id);
     userCurrent.info.firtname = body.firtname || userCurrent.info.firtname;
     userCurrent.info.lastname = body.lastname || userCurrent.info.lastname;
@@ -92,6 +96,8 @@ export async function _postUpdateInfo(req, res, next) {
     return next(err);
   }
 }
+
+
 
 /* ====================================================================================================================================================================== */
 
@@ -155,5 +161,44 @@ export async function testCreateUser(req, res, next) {
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
     return next(err);
+  }
+}
+
+export async function _postResetPassword(req, res, next) {
+  const body = filteredBody(req.body,["email"]);
+  try {
+    const user = await UserModel.findOne({ 'email': body.email });
+    if (!user) {
+      return res
+        .status(HTTPStatus.NOT_FOUND)
+        .json({ error: true, message: 'Tài khoản không tồn tại' });
+    }
+    const resetPasswordToken = crypto.randomBytes(16).toString('hex');
+    user.resetPasswordToken = resetPasswordToken;
+    user.resetPasswordExpires =
+      Date.now() + 18000000; /* 60*60*1000 *5/ 5 tieng */
+    const mailOption = {
+      from: 'Hai Au copany <services.haiaucompany@gmail.com>',
+      to: body.email,
+      subject: 'Khôi phục mật khẩu tài khoản nhân viên',
+      text: ` Xin chào ${user.info.fullname}, có vẻ bạn vừa yêu cầu khôi phục mật khẩu nhân viên!
+              nếu chính xác là bạn quên mật khẩu vui lòng truy cập:
+
+                  >>>>>  http://localhost:3000/user/forgot/${resetPasswordToken} <<<<<
+
+              Nếu không phải bạn, có thể tài khoản của bạn đã bị tấn công, vui lòng liên hệ ban quản lý! `,
+    };
+    agenda.now('sendmail', mailOption); /* send mail Ngay lập tức */
+    await user.save();
+
+    return res
+      .status(HTTPStatus.OK)
+      .json({ error: false, message: 'Vui lòng check mail' });
+  } catch (error) {
+    console.log('=====================================');
+    console.log('Lỗi ở forgot', error);
+    console.log('=====================================');
+    error.status = HTTPStatus.BAD_REQUEST;
+    return next(error);
   }
 }

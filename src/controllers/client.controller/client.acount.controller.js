@@ -252,11 +252,12 @@ export async function _postResetPassword(req, res, next) {
       from: 'Hai Au copany <services.haiaucompany@gmail.com>',
       to: body.email,
       subject: 'Khôi phục mật khẩu',
-      text: ` Xin chào ${client.info.firstname} ${client.info
-        .lastname}, vui lòng nhấp vào link để đặt lại mặt khẩu của bạn:
+      text: ` Xin chào ${client.fullname}, vui lòng nhấp vào link để đặt lại mặt khẩu của bạn:
+
                         http://localhost:3000/client/forgot/${resetPasswordToken}`,
     };
     agenda.now('sendmail', mailOption); /* send mail Ngay lập tức */
+    await client.save();
 
     return res
       .status(HTTPStatus.OK)
@@ -283,11 +284,13 @@ export async function _postSetingNewPassword(req, res, next) {
     if (client.local.resetPasswordExpires < new Date()) {
       return res.status(HTTPStatus.LOCKED).json({
         error: true,
-        message:"Mã xác nhận đã hết hạn ",
+        message: 'Mã xác nhận đã hết hạn ',
       });
     }
     client.local.password = req.body.password;
-    return res.status(HTTPStatus.OK).json({ error: false, result: await client.save() });
+    return res
+      .status(HTTPStatus.OK)
+      .json({ error: false, result: await client.save() });
   } catch (error) {
     error.status = HTTPStatus.BAD_REQUEST;
     next(error);
@@ -539,16 +542,14 @@ export async function uploadAvatar(req, res, next) {
         .status(HTTPStatus.BAD_REQUEST)
         .json({ err: true, message: 'Koi roi' });
     }
-    return res
-      .status(HTTPStatus.OK)
-      .json({
-        err: false,
-        result: await Client.findByIdAndUpdate(
-          clientID,
-          { 'local.photo': req.file.location },
-          { new: true },
-        ),
-      });
+    return res.status(HTTPStatus.OK).json({
+      err: false,
+      result: await Client.findByIdAndUpdate(
+        clientID,
+        { 'local.photo': req.file.location },
+        { new: true },
+      ),
+    });
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
     return next(err);

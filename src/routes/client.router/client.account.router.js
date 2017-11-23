@@ -63,7 +63,7 @@ route.post(
 route.get(
   "/profile/history",
   authJwt,
-  clientControler.acountClientController._getHistoryExchange
+  acountClientController._getHistoryExchange
 );
 
 export default route;

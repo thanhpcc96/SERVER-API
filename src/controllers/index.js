@@ -1,5 +1,5 @@
 import usercontroller from './user.controller';
-import {acountClientController } from './client.controller';
+import {acountClientController, interactClientController } from './client.controller';
 import {
   _getClientSeeds,
   _deleteAllClient,
@@ -10,8 +10,9 @@ import {
 } from './seed.controller';
 
 export {
-  usercontroller,
   acountClientController,
+  interactClientController,
+  usercontroller,
   _getClientSeeds,
   _deleteAllClient,
   _generateChuyenSeed,

@@ -68,7 +68,7 @@ const chuyen = new Schema({
         type: Number,
         default: 0
     },
-    
+
   }, { timestamps: true });
 
   chuyen.pre('save', function (next) {
