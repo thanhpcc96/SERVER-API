@@ -1,10 +1,10 @@
-import HTTPStatus from "http-status";
-import Joi from "joi";
+import HTTPStatus from 'http-status';
+import Joi from 'joi';
 
-import UserModel from "../../models/user.model";
-import constants from "../../config/constants";
-import { filteredBody } from "../../ultils/filterBody";
-import agenda from '../../jobLoader'
+import UserModel from '../../models/user.model';
+import constants from '../../config/constants';
+import { filteredBody } from '../../ultils/filterBody';
+import agenda from '../../jobLoader';
 
 export const validation = {
   login: {
@@ -14,8 +14,8 @@ export const validation = {
         .required(),
       password: Joi.string()
         .regex(/^[a-zA-Z0-9]{3,30}$/)
-        .required()
-    }
+        .required(),
+    },
   },
   updateInfo: {
     body: {
@@ -23,8 +23,8 @@ export const validation = {
       lastname: Joi.string(),
       address: Joi.string(),
       dateofbirth: Joi.date(),
-      phone: Joi.string().regex(/^[0-9-+]+$/)
-    }
+      phone: Joi.string().regex(/^[0-9-+]+$/),
+    },
   },
   updatePassWord: {
     body: {
@@ -33,9 +33,9 @@ export const validation = {
         .required(),
       newpassword: Joi.string()
         .min(6)
-        .required()
-    }
-  }
+        .required(),
+    },
+  },
 };
 
 /**
@@ -67,6 +67,19 @@ export async function _getUserInfo(req, res, next) {
   }
 }
 
+export async function _getCheckJWT(req, res, next) {
+  try {
+    const user = await UserModel.findById(req.user._id);
+    return res.status(HTTPStatus.OK).json({
+      err: false,
+      result: user.toAuthJSON(),
+    });
+  } catch (err) {
+    err.status = HTTPStatus.BAD_REQUEST;
+    return next(err);
+  }
+}
+
 /* ====================================================================================================================================================================== */
 
 /**
@@ -78,8 +91,11 @@ export async function _postUpdateInfo(req, res, next) {
   const body = filteredBody(req.body, constants.WHITELIST.manager.updateInfo);
   try {
     const id = req.user._id;
-    if(req.user.role !== 1){
-      return res.status(HTTPStatus.BAD_REQUEST).json({ err: true, message: " Ban khong du quyen de thay doi thong tin"});
+    if (req.user.role !== 1) {
+      return res.status(HTTPStatus.BAD_REQUEST).json({
+        err: true,
+        message: ' Ban khong du quyen de thay doi thong tin',
+      });
     }
     const userCurrent = await UserModel.findById(id);
     userCurrent.info.firtname = body.firtname || userCurrent.info.firtname;
@@ -97,14 +113,12 @@ export async function _postUpdateInfo(req, res, next) {
   }
 }
 
-
-
 /* ====================================================================================================================================================================== */
 
 export async function _postUpdatePass(req, res, next) {
   const body = filteredBody(
     req.body,
-    constants.WHITELIST.manager.updatePassWord
+    constants.WHITELIST.manager.updatePassWord,
   );
   try {
     const idUser = req.user._id;
@@ -112,7 +126,7 @@ export async function _postUpdatePass(req, res, next) {
     if (!userCurrent.authenticateUser(body.password)) {
       return res
         .status(HTTPStatus.NON_AUTHORITATIVE_INFORMATION)
-        .json({ err: true, message: "Mat khau cu khong trung khop" });
+        .json({ err: true, message: 'Mat khau cu khong trung khop' });
     }
     userCurrent.password = body.newpassword;
     return res
@@ -142,18 +156,17 @@ export async function testCreateUser(req, res, next) {
   try {
     const user = {
       info: {
-        lastname: req.body.lastname,
-        firstname: req.body.firstname,
-        phone: req.body.phone,
+        fullname: req.body.fullname,
+        phoneNumber: req.body.phone,
         dateofbirth: req.body.dateofbirth,
-        passport: req.body.passport,
+        passportNumber: req.body.passport,
         gender: req.body.gender,
-        address: req.body.address
+        address: req.body.address,
       },
       email: req.body.email,
       password: req.body.password,
       username: req.body.username,
-      role: req.body.role
+      role: req.body.role,
     };
     return res
       .status(HTTPStatus.OK)
@@ -164,10 +177,10 @@ export async function testCreateUser(req, res, next) {
   }
 }
 
-export async function _postResetPassword(req, res, next) {
-  const body = filteredBody(req.body,["email"]);
+export async function _postForgotPassword(req, res, next) {
+  const body = filteredBody(req.body, ['email']);
   try {
-    const user = await UserModel.findOne({ 'email': body.email });
+    const user = await UserModel.findOne({ email: body.email });
     if (!user) {
       return res
         .status(HTTPStatus.NOT_FOUND)
@@ -181,7 +194,8 @@ export async function _postResetPassword(req, res, next) {
       from: 'Hai Au copany <services.haiaucompany@gmail.com>',
       to: body.email,
       subject: 'Khôi phục mật khẩu tài khoản nhân viên',
-      text: ` Xin chào ${user.info.fullname}, có vẻ bạn vừa yêu cầu khôi phục mật khẩu nhân viên!
+      text: ` Xin chào ${user.info
+        .fullname}, có vẻ bạn vừa yêu cầu khôi phục mật khẩu nhân viên!
               nếu chính xác là bạn quên mật khẩu vui lòng truy cập:
 
                   >>>>>  http://localhost:3000/user/forgot/${resetPasswordToken} <<<<<

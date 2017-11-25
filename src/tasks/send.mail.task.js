@@ -9,7 +9,7 @@ export default function sendmail(agenda) {
         const mailOption = job.attrs.data; // nhanj vao optionMail
         tranporter.sendMail(mailOption, (err, info) => {
             if (err) {
-                return done(new Error("email khong ton tai"))
+                return done(err)
             }
             done();
         });

@@ -78,48 +78,6 @@ const ClientUserSchema = new Schema(
         type: Date
       }
     },
-    // facebook: {
-    //     id: {
-    //         type: String,
-    //         trim: true
-    //     },
-    //     token: {
-    //         type: String,
-    //         trim: true
-    //     },
-    //     email: {
-    //         type: String,
-    //         trim: true
-    //     },
-    //     name: {
-    //         type: String
-    //     },
-    //     photo: {
-    //         type: String,
-    //         trim: true
-    //     }
-    // },
-    // google: {
-    //     id: {
-    //         type: String,
-    //         trim: true,
-    //     },
-    //     token: {
-    //         type: String,
-    //         trim: true
-    //     },
-    //     email: {
-    //         type: String,
-    //         trim: true
-    //     },
-    //     name: {
-    //         type: String
-    //     },
-    //     photo: {
-    //         type: String,
-    //         trim: true
-    //     }
-    // },
     scoreFriendly: {
       type: Number,
       default: 10

@@ -236,9 +236,13 @@ export async function _getInfo(req, res, next) {
  *  }
  */
 export async function _postResetPassword(req, res, next) {
-  const body = filteredBody(req.body, constants.WHITELIST.client.resetPassword);
+  const body = filteredBody(req.body, ["email"]);
+
   try {
-    const client = await Client.findOne({ 'local.email': body.email });
+
+    const client = await Client.findOne({'local.email': body.email });
+    // const client = await Client.findById("59fdaedd5556520540a39fa3");
+
     if (!client) {
       return res
         .status(HTTPStatus.NOT_FOUND)

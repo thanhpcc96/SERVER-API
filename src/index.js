@@ -69,7 +69,7 @@ io.attach(server);
 // }
 // kiem tra neu co 1 instance roi thi khong chay
 if (!module.parent) {
-    server.listen(constants.PORT,"0.0.0.0", err => {
+    server.listen(constants.PORT, err => {
         if (err) {
             console.log(chalk.red("Khong the khoi chay ung dung!"));
         } else {
