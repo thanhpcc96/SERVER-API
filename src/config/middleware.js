@@ -13,6 +13,7 @@ import expressStatusMonitor from 'express-status-monitor';
 
 import winstonInstance from './winston';
 
+
 const isTest = process.env.NODE_ENV === 'test';
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -21,6 +22,7 @@ export default app => {
     app.use(bodyParser.json({limit:'10mb'}));
     app.use(bodyParser.urlencoded({ extended: true ,limit: '10mb', parameterLimit:50000}));
     app.use(passport.initialize());
+// app.use(upload);
     app.use(helmet());
     app.use(cors());
     app.use(expressStatusMonitor());

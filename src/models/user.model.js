@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import uniqueValidator from 'mongoose-unique-validator';
 import constants from '../config/constants';
 
+
 const UserSchema = new Schema({
     email: {
         type: String,
@@ -58,7 +59,7 @@ const UserSchema = new Schema({
             type: String
         },
         photoProfile: {
-            type: Array
+            type: String
         },
 
     },

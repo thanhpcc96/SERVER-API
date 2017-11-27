@@ -14,9 +14,14 @@ const routes = new Router();
 
 routes.get("/all", authJwt, controller._getAllUser);
 
+
+/** get thong tin tai khoan user */
+
+routes.get('/:id', authJwt, controller._getInfoUser)
+
 /** Xoa tai khoan nhan vien */
 routes.post(
-  "/users/delete",
+  "/delete",
   authJwt,
   validate(validation.deleteUser),
   controller._deleteUser
@@ -24,11 +29,14 @@ routes.post(
 
 /** Post tao tai khoan nhan vien moi */
 routes.post(
-  "/users",
+  "/create",
   authJwt,
   validate(validation.createUser),
   controller._postCreateUser
 );
-routes.post("/upload", upload.array('profile',2), controller.uploadPhotoProfile);
+routes.post("/upload", upload.any(), controller._uploadFile);
+
+/** post update info */
+routes.post('/update', authJwt,validate(validation.updateInfo) ,controller._postUpdateInfo);
 
 export default routes;

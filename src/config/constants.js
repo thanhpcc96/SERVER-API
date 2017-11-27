@@ -3,9 +3,9 @@ require("dotenv").config();
 
 const WHITELIST = {
   manager: {
-    createUser: ["email", "username",'firstname','lastname','address','passport','phone','gender','dateofbirth'],
+    createUser: ["email", 'fullname','username','address','passport','phone','gender','dateofbirth','role'],
     deleteUser:["iduser"],
-    updateInfo: ["firstname", "lastname","address",'dateofbirth','phone'],
+    updateInfo: ["passport", "fullname","address",'dateofbirth','phone',"email","role"],
     updatePassWord:['password','newpassword'],
     deleteClient: ["one", "list"],
     rechairCoin: ["idclient","amount"],

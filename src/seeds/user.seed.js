@@ -34,9 +34,11 @@ export async function userSeed(role) {
         fullname: `${faker.name.firstName()} ${faker.name.lastName()}`,
         passportNumber: faker.random.uuid(),
         address: `${faker.address.country('VN')} `,
-        phoneNumber:faker.phone.phoneNumber()
+        phoneNumber:faker.phone.phoneNumber(),
+        dateofbirth: faker.date.between('01/01/1990','28/12/1998') ,
+        gender: "KHAC"
       },
-      role, // phu xe
+      role : faker.random.number(4), // phu xe
       status: 'ACTIVE',
     };
     return user.push(fakeClient);
