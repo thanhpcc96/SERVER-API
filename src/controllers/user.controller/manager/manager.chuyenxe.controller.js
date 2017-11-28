@@ -6,7 +6,7 @@ import { filteredBody } from '../../../ultils/filterBody';
 export const validation = {
   getFullInfoChuyen: {
     body: {
-      ischuyen: Joi.string().required(),
+      tenchuyen: Joi.string().required(),
     },
   },
 };
@@ -32,9 +32,9 @@ export async function getAllChuyen(req, res, next) {
 }
 
 export async function getFullInfoChuyen(req, res, next) {
-  const body = filteredBody(req.body, ['sochuyen']);
+  const body = filteredBody(req.body, ['tenchuyen']);
   try {
-    const ketqua = await ChuyenxeModel.findOne({sochuyen: body.sochuyen})
+    const ketqua = await ChuyenxeModel.findOne({tenchuyen: body.sochuyen})
       .populate('routeOfTrip')
       .populate('thanhtrakiemtra')
       .populate('laixevaphuxe')
