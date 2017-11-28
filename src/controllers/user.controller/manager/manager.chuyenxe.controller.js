@@ -2,6 +2,7 @@ import HTTPStatus from 'http-status';
 import Joi from 'joi';
 import ChuyenxeModel from '../../../models/chuyenxe.model';
 import { filteredBody } from '../../../ultils/filterBody';
+import monent from 'moment';
 
 export const validation = {
   getFullInfoChuyen: {
@@ -18,7 +19,7 @@ export async function getAllChuyen(req, res, next) {
         .status(HTTPStatus.UNAUTHORIZED)
         .json({ err: true, message: 'Ban khong co quyen' });
     }
-    const result = await ChuyenxeModel.find();
+    const result = await ChuyenxeModel.find({ timeStart: { $gte : monent().subtract(1,'day')}});
     if (!result) {
       return res
         .status(HTTPStatus.NOT_FOUND)

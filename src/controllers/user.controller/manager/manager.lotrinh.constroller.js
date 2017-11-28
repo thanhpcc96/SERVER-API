@@ -77,6 +77,16 @@ export async function getAllTuyen(req, res, next) {
     return next(err);
   }
 }
+export async function getinfoTuyen(req, res, next) {
+  try {
+    return res
+      .status(HTTPStatus.OK)
+      .json({ err: false, result: await LotrinhModel.findById(req.params.id).populate('xetronglotrinh') });
+  } catch (err) {
+    err.status = HTTPStatus.BAD_REQUEST;
+    return next(err);
+  }
+}
 
 export async function updateTuyen(req, res, next) {
   const whitelist = [

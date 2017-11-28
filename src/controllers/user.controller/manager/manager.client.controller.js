@@ -1,28 +1,28 @@
-import HTTPStatus from "http-status";
-import Joi from "joi";
+import HTTPStatus from 'http-status';
+import Joi from 'joi';
 
-import Client from "../../../models/client.model";
-import constants from "../../../config/constants";
-import { filteredBody } from "../../../ultils/filterBody";
+import Client from '../../../models/client.model';
+import constants from '../../../config/constants';
+import { filteredBody } from '../../../ultils/filterBody';
 
 export const validation = {
   deleteClient: {
     body: {
       one: Joi.string(),
-      list: Joi.string()
-    }
+      list: Joi.string(),
+    },
   },
   rechairCoin: {
     body: {
       idclient: Joi.string().required(),
-      amount: Joi.number().required()
-    }
+      amount: Joi.number().required(),
+    },
   },
   getTicketPaymentOfClient: {
     body: {
-      idclient: Joi.string()
-    }
-  }
+      idclient: Joi.string(),
+    },
+  },
 };
 
 /**
@@ -38,7 +38,7 @@ export async function _getAllClient(req, res, next) {
     if (user.role !== 1) {
       return res.status(HTTPStatus.FORBIDDEN).json({
         err: true,
-        message: "Bạn không có quyền truy cập chức năng này!"
+        message: 'Bạn không có quyền truy cập chức năng này!',
       });
     }
     return res
@@ -63,22 +63,22 @@ export async function _deleteClient(req, res, next) {
     if (user.role !== 1) {
       return res.status(HTTPStatus.FORBIDDEN).json({
         err: true,
-        message: "Ban khong co quyen truy cap chuc nang nay!"
+        message: 'Ban khong co quyen truy cap chuc nang nay!',
       });
     }
     // let dataQuery = body.one === undefined ? body.list : body.one;
     if (body.list) {
-      const dataQuery = body.list.split(";");
+      const dataQuery = body.list.split(';');
       await Client.deleteMany({ _id: { $in: dataQuery } });
       return res.status(HTTPStatus.OK).json({
         err: false,
-        message: `Xoa thanh cong ${dataQuery.lenght} khach hang`
+        message: `Xoa thanh cong ${dataQuery.lenght} khach hang`,
       });
     }
     await Client.findByIdAndRemove(body.one);
     return res
       .status(HTTPStatus.OK)
-      .json({ err: false, message: "Xoa thanh cong 1 khach hang" });
+      .json({ err: false, message: 'Xoa thanh cong 1 khach hang' });
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
     return next(err);
@@ -97,14 +97,14 @@ export async function _putRechairCoin(req, res, next) {
     if (user.role !== 1) {
       return res.status(HTTPStatus.FORBIDDEN).json({
         err: true,
-        message: "Ban khong co quyen truy cap chuc nang nay!"
+        message: 'Ban khong co quyen truy cap chuc nang nay!',
       });
     }
     const client = await Client.findById(body.idclient);
     if (!client) {
       return res
         .status(HTTPStatus.NOT_FOUND)
-        .json({ err: true, message: "Khach hang khong ton tai" });
+        .json({ err: true, message: 'Khach hang khong ton tai' });
     }
     const oldBalace = client.acount_payment.balance;
     client.acount_payment.balance = oldBalace + parseInt(body.amount, 0);
@@ -113,7 +113,7 @@ export async function _putRechairCoin(req, res, next) {
       idUser: user._id, // Id nhan vien nhan tien
       nameUser: user.fullname,
       amountSend: parseInt(body.amount, 0),
-      oldBalace
+      oldBalace,
     });
     return res
       .status(HTTPStatus.OK)
@@ -125,15 +125,29 @@ export async function _putRechairCoin(req, res, next) {
 }
 /**
  * Hàm lấy ra những danh sách những vé mà 1 khách hàng đã đặt
- * @param {Object} req 
- * @param {Object} res 
+ * @param {Object} req
+ * @param {Object} res
  */
 export async function _getAllTicketPaymentOfClient(req, res, next) {
-  const body = filteredBody(req.params, ["idclient"]);
+  const body = filteredBody(req.params, ['idclient']);
   try {
     const kq = await Client.findById(body.idclient)
-      .populate("acount_payment.history_transaction")
-      .populate("acount_payment.history_pick_keep_seat");
+      .populate('acount_payment.history_transaction')
+      .populate('acount_payment.history_pick_keep_seat');
+
+    return res.status(HTTPStatus.OK).json({ err: false, result: kq });
+  } catch (err) {
+    err.status = HTTPStatus.BAD_REQUEST;
+    return next(err);
+  }
+}
+export async function _getInfoClient(req, res, next) {
+  const body = filteredBody(req.params, ['idclient']);
+  try {
+    const kq = await Client.findById(body.idclient)
+      .populate('acount_payment.history_transaction')
+      .populate('acount_payment.history_pick_keep_seat')
+      .populate('acount_payment.history_cancel_ticket');
     return res.status(HTTPStatus.OK).json({ err: false, result: kq });
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;

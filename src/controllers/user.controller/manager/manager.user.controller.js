@@ -193,7 +193,7 @@ export async function _uploadFile(req, res, next) {
         .json({ err: true, message: 'Loi roi' });
     }
     const  f= req.files[0];
-    console.log('===============================');
+    console.log('================file===============');
     console.log(f);
     console.log('===============================');
     return res.status(HTTPStatus.OK).json({
@@ -235,5 +235,39 @@ export async function _postUpdateInfo(req, res, next) {
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
     return next(err);
+  }
+}
+
+export async function _getListLaiXeChuaPhanCong(req,res,next){
+  try {
+    const kq=[];
+    const listResult= await User.find({role : 2});
+    listResult.forEach(user=>{
+      if(!user.xephancong){
+          kq.push(user);
+      }
+    });
+    return res.status(HTTPStatus.OK).json({err: false, result: kq});
+  } catch (error) {
+    error.status= HTTPStatus.BAD_REQUEST;
+    next(error);
+  }
+}
+export async function _getListPhuXeChuaPhanCong(req,res,next){
+  try {
+    const kq=[];
+    const listResult= await User.find({role : 3});
+    listResult.forEach(user=>{
+      if(!user.xephancong){
+          kq.push(user);
+      }
+    });
+    console.log('===============================');
+    console.log(kq);
+    console.log('===============================');
+    return res.status(HTTPStatus.OK).json({err: false, result: kq});
+  } catch (error) {
+    error.status= HTTPStatus.BAD_REQUEST;
+    next(error);
   }
 }

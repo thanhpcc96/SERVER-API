@@ -17,7 +17,7 @@ routes.get("/all", authJwt, controller._getAllUser);
 
 /** get thong tin tai khoan user */
 
-routes.get('/:id', authJwt, controller._getInfoUser)
+
 
 /** Xoa tai khoan nhan vien */
 routes.post(
@@ -38,5 +38,8 @@ routes.post("/upload", upload.any(), controller._uploadFile);
 
 /** post update info */
 routes.post('/update', authJwt,validate(validation.updateInfo) ,controller._postUpdateInfo);
+
+routes.get('/laixe', authJwt, controller._getListLaiXeChuaPhanCong);
+routes.get('/phuxe', authJwt, controller._getListPhuXeChuaPhanCong);
 
 export default routes;

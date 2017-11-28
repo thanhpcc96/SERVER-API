@@ -42,12 +42,22 @@ export async function getAllCoach(req, res, next) {
   }
 }
 export async function createCoach(req, res, next) {
-  const whiteList = ['numberplate', 'seat', 'name', 'productiontime'];
+  const whiteList = ['numberplate', 'seat', 'name', 'productiontime',"idlaixe","idphuxe"];
   const body = filteredBody(req.body, whiteList);
+  const xe={
+    numberplate: body.numberplate,
+    seat: body.seat,
+    name: body.name,
+    productiontime: body.productiontime,
+    phutrach:{
+      laixe: body.idlaixe,
+      phuxe: body.idphuxe,
+    }
+  }
   try {
     return res
       .status(HTTPstatus.CREATED)
-      .json({ err: false, result: await CoachModel.create(body) });
+      .json({ err: false, result: await CoachModel.create(xe) });
   } catch (err) {
     err.status = HTTPstatus.BAD_REQUEST;
     return next(err);

@@ -11,6 +11,7 @@ const validation = managerTuyen.vaildation;
 
 route.get('/all', authJwt, managerTuyen.getAllTuyen);
 
+route.get('/info/:id', authJwt, managerTuyen.getinfoTuyen);
 route.post(
   '/create',
   authJwt,

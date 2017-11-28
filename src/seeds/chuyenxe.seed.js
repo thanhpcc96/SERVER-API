@@ -180,6 +180,9 @@ export async function deleteAllChuyen() {
 }
 export async function generateChuyenInDay() {
   try {
+    console.log('===============================');
+    console.log('Vao gennnn');
+    console.log('===============================');
     const listLoTrinh = await LotrinhModel.find({});
     const listong = [];
     if (!listLoTrinh) return;
@@ -208,6 +211,7 @@ export async function generateChuyenInDay() {
           choNgoi: 45,
           tinhtrang: [],
           loai: 'DI',
+          coach: null,
         };
         const chuyenDi2 = {
           tenchuyen: `${listLoTrinh[n].routeOfTrip.from}-${listLoTrinh[n]
@@ -228,6 +232,7 @@ export async function generateChuyenInDay() {
           choNgoi: 45,
           tinhtrang: [],
           loai: 'DI',
+          coach: null,
         };
         const chuyenVe1 = {
           tenchuyen: `${listLoTrinh[n].routeOfTrip.to}-${listLoTrinh[n]
@@ -247,7 +252,8 @@ export async function generateChuyenInDay() {
           ticketsInChuyen: [],
           choNgoi: 45,
           tinhtrang: [],
-          loai: 'DI',
+          loai: 'VE',
+          coach: null,
         };
         const chuyenVe2 = {
           tenchuyen: `${listLoTrinh[n].routeOfTrip.to}-${listLoTrinh[n]
@@ -267,42 +273,66 @@ export async function generateChuyenInDay() {
           ticketsInChuyen: [],
           choNgoi: 45,
           tinhtrang: [],
-          loai: 'DI',
+          loai: 'VE',
+          coach: null,
         };
         listdi.push(...[chuyenDi1, chuyenDi2]);
         listve.push(...[chuyenVe1, chuyenVe2]);
+        console.log('===============trk for================');
+        console.log(listdi.length);
+        console.log(listve.length);
+        console.log('===============================');
       }
+      console.log('===============Ra khoi for================');
+      console.log(listdi.length);
+      console.log(listve.length);
+      console.log('===============================');
       // phan cong chuyen di
-      for (let i = 0; i < listLoTrinh[n].xetronglotrinh.length / 2; i++) {
-        for (let j = i; j < listdi.length; j++) {
-          listdi[j].coach = listLoTrinh[n].xetronglotrinh[i];
-          listdi[j + 16].coach = listLoTrinh[n].xetronglotrinh[i];
-        }
-        for (let f = i + 8; f < 15; f++) {
+      for (let i = 0; i < (listLoTrinh[n].xetronglotrinh.length / 2); i++) {
+        // for (let j = i; j < (listLoTrinh[n].xetronglotrinh.length / 2)-1; j++) {
+          // console.log('================tesst data===============');
+          // console.log(i);
+          // console.log(listdi[i]);
+          // console.log(listdi[i+16]);
+          // console.log(i+16);
+          // console.log('===============================');
+        // }
+        listdi[i].coach = listLoTrinh[n].xetronglotrinh[i];
+        listdi[i + 16].coach = listLoTrinh[n].xetronglotrinh[i];
+        for (let f = i + 7; f < 16; f++) {
           listve[f].coach = listLoTrinh[n].xetronglotrinh[i];
+          console.log('==============lisve f=================');
+          console.log(listve[f]);
+          console.log('===============================');
         }
       }
       for (
-        let i = listLoTrinh[n].xetronglotrinh.length / 2;
-        i < listLoTrinh[n].xetronglotrinh.length;
+        let i = (listLoTrinh[n].xetronglotrinh.length / 2)-1;
+        i < listLoTrinh[n].xetronglotrinh.length / 2;
         i++
       ) {
-        for (let j = i - 8; j < listve.length; j++) {
+        for (let j = i - 7; j < listLoTrinh[n].xetronglotrinh.length / 2 - 1; j++) {
           listve[j].coach = listLoTrinh[n].xetronglotrinh[i];
-          listve[j + 15].coach = listLoTrinh[n].xetronglotrinh[i];
+          listve[j + 16].coach = listLoTrinh[n].xetronglotrinh[i];
         }
         for (let f = i + 8; f < 15; f++) {
           listdi[f].coach = listLoTrinh[n].xetronglotrinh[i];
         }
-
       }
-     for(let z=0; z < listdi.length; z++){
-
-     }
+      console.log('=============sau==================');
+      console.log(listdi.length);
+      console.log(listve.length);
+      console.log('===============================');
       listong.push(...listdi, ...listve);
     }
+    console.log('==============thong=================');
+    console.log(listong.length);
+    console.log('===============================');
     return await ChuyenxeModel.insertMany(listong);
   } catch (err) {
+    console.log('===============================');
+    console.log(err);
+    console.log('===============================');
     return err;
   }
 }

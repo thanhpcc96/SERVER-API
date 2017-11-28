@@ -32,6 +32,12 @@ route.get(
   controller._getAllTicketPaymentOfClient
 );
 
+route.get(
+  "/:idclient",
+  authJwt,
+  controller._getInfoClient
+);
+
 /**
  * PUT nap tien cho khach hang
  */
