@@ -13,12 +13,15 @@ route.get('/tickets', authJwt, interactClientController._getAvaiableTicket);
 route.get(
   '/ticket/:idve',
   authJwt,
-  validate(validation.getinfove),
   interactClientController.getInfoTicket,
 );
 
 // router get thong tin lich su giao dich
 route.get('/history', authJwt, interactClientController._getHistoryTransction);
+
+
+
+route.get('/ticket_avaible', authJwt, interactClientController._getAvaiableTicket);
 
 
 // route put noi dung comment

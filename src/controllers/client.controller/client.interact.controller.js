@@ -33,10 +33,12 @@ export async function _getAvaiableTicket(req, res, next) {
   // .populate('acount_payment.history_cancel_ticket');
   try {
     const idClient = req.user._id;
-    const listicket = await Ticket.find({ Customer: idClient }).populate({
-      path: 'inChuyenXe',
-      match: { timeEnd: { $gt: Date.now() } },
-    });
+    const listicket = await Ticket.find({ Customer: idClient })
+      .populate({
+        path: 'inChuyenXe',
+        match: { timeEnd: { $gt: Date.now() } },
+      })
+      .populate('Customer', 'info.fullname');
     if (!listicket) {
       return res.status(HTTPStatus.BAD_REQUEST).json({
         error: true,
@@ -59,10 +61,24 @@ export async function _getAvaiableTicket(req, res, next) {
  */
 export async function getInfoTicket(req, res, next) {
   const body = filteredBody(req.params, ['idve']);
+  console.log('===============================');
+  console.log(body);
+  console.log('===============================');
   try {
     const ticket = await Ticket.findById(body.idve)
-      .populate('inChuyenXe')
-      .populate('Customer');
+      .populate({
+        path: 'inChuyenXe',
+        populate: {
+          path: 'routeOfTrip',
+        },
+      })
+      .populate({
+        path: 'inChuyenXe',
+        populate: {
+          path: 'coach',
+        },
+      })
+      .populate('Customer', 'info.fullname');
     if (!ticket) {
       return res
         .status(HTTPStatus.BAD_REQUEST)

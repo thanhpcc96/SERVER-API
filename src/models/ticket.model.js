@@ -26,7 +26,7 @@ const TicketSchema = new Schema(
     },
     inChuyenXe: {
       type: Schema.Types.ObjectId,
-      ref: 'chuyenxe',
+      ref: 'chuyen',
     },
     Customer: {
       type: Schema.Types.ObjectId,

@@ -77,6 +77,22 @@ const chuyen = new Schema({
     }
     return next();
 });
+chuyen.methods={
+  handlePickChuyen:{
+    pickChuyen(idVe){
+      this.ticketsInChuyen.push(idVe);
+      this.dadat= this.dadat +1;
+      return this.save();
+    },
+    cancelChuyen(idVe){
+      if(this.ticketsInChuyen.indexOf(idVe) >=0 ){
+        this.ticketsInChuyen.remove(idVe);
+        this.dadat= this.dadat -1;
+      };
+      return this.save();
+    }
+  }
+}
 chuyen.statics={
   list({ query={}, skip= 0, limit= 5 } = {}){
       return this.find(query)

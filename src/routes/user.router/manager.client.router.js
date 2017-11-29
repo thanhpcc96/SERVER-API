@@ -33,7 +33,7 @@ route.get(
 );
 
 route.get(
-  "/:idclient",
+  "/info/:idclient",
   authJwt,
   controller._getInfoClient
 );

@@ -15,6 +15,13 @@ route.post(
   validate(validation.getTicketInfo),
   managerTicket.getTicketInfo,
 );
+route.post(
+  '/info/id',
+  authJwt,
+  validate(validation.getTicketInfo),
+  managerTicket.getTicketbyID,
+);
+
 
 route.get('/all', authJwt, managerTicket.getAllTicket);
 

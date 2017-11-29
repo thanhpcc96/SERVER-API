@@ -17,7 +17,20 @@ const ClientUserSchema = new Schema(
         default: 0,
         min: 0
       },
-      history_recharge: [],
+      history_recharge: [
+        {
+          rechargeTime: {
+            type: Date,
+            default: Date.now()
+          },
+          idUser:{
+            type: Schema.Types.ObjectId,
+            ref: 'users'
+          }, // Id nhan vien nhan tien
+          amountSend: Number,
+          oldBalace: Number,
+        }
+      ],
       history_transaction: [
         {
           type: Schema.Types.ObjectId,

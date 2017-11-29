@@ -111,7 +111,6 @@ export async function _putRechairCoin(req, res, next) {
     client.acount_payment.history_recharge.push({
       rechargeTime: Date.now(),
       idUser: user._id, // Id nhan vien nhan tien
-      nameUser: user.fullname,
       amountSend: parseInt(body.amount, 0),
       oldBalace,
     });
@@ -145,6 +144,7 @@ export async function _getInfoClient(req, res, next) {
   const body = filteredBody(req.params, ['idclient']);
   try {
     const kq = await Client.findById(body.idclient)
+      .populate('acount_payment.history_recharge.idUser')
       .populate('acount_payment.history_transaction')
       .populate('acount_payment.history_pick_keep_seat')
       .populate('acount_payment.history_cancel_ticket');

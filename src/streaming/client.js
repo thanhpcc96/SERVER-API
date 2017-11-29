@@ -34,7 +34,7 @@ export const clientSocket = io => {
     /* Load chuyến xe có thể đăng ký */
     socket.on('loadchuyenxe', async ClientID => {
       console.log('===============================');
-      console.log(' on loadchuyenxe ',ClientID);
+      console.log(' on loadchuyenxe ', ClientID);
       console.log('===============================');
       try {
         if (listchuyen.length > 0) {
@@ -44,16 +44,10 @@ export const clientSocket = io => {
           });
         }
         const result = await chuyenxeModel
-          .find(
-            {
-              // timeStart: {
-              //   $lte: momment(),
-              //   $gt: momment()
-              //     .add(1, "day")
-              //     .set({ hour: 7, minute: 0 })
-              // }
-            },
-          )
+          .find({
+            //timeStart: { $gte: momment().subtract(1, 'day') },
+            timeStart: { $gte: momment().add(1,'hour')}
+          })
           .populate('routeOfTrip', 'routeOfTrip.lotrinh')
           .populate({
             path: 'ticketsInChuyen',
@@ -67,10 +61,12 @@ export const clientSocket = io => {
         }
         listchuyen = result;
         for (let i = 0; i < listchuyen.length; i++) {
-          for (let j =0; j< listchuyen[i].ticketsInChuyen.length; j++) {
-              if(listchuyen[i].ticketsInChuyen[j].Customer.toString() === ClientID){
-                listchuyen.splice(i, 1);
-              }
+          for (let j = 0; j < listchuyen[i].ticketsInChuyen.length; j++) {
+            if (
+              listchuyen[i].ticketsInChuyen[j].Customer.toString() === ClientID
+            ) {
+              listchuyen.splice(i, 1);
+            }
           }
         }
         socket.emit('updateListChuyenxe', {
@@ -89,33 +85,36 @@ export const clientSocket = io => {
       }
     });
     /** Tìm kiếm chuyến xe */
-    socket.on('timkiem',async query => {
+    socket.on('timkiem', async query => {
       try {
         //if (listchuyen.length == 0) {
-          const result = await chuyenxeModel
-            .find({
-              timeStart: {
-                $lte: query.timeStart || momment(),
-                $gt: momment()
-                  .add(1, 'day')
-                  .set({ hour: 7, minute: 0 }),
-              },
-            })
-            .populate({
-              path: 'routeOfTrip',
-              select: 'routeOfTrip',
-              options: {
-                $text: { $search: query.textSearch },
-              },
-           });
-          /** http://mongoosejs.com/docs/api.html#querystream_QueryStream */
-          if(!result){
-            socket.emit('resultSearch', { type: 'RESULT_SEARCH_ERROR', error: "Ko Tim duoc ket qua" });
-          }
-          socket.emit('resultSearch', {
-            type: 'RESULT_SEARCH_SUCCESS',
-            result,
+        const result = await chuyenxeModel
+          .find({
+            timeStart: {
+              $lte: query.timeStart || momment(),
+              $gt: momment()
+                .add(1, 'day')
+                .set({ hour: 7, minute: 0 }),
+            },
+          })
+          .populate({
+            path: 'routeOfTrip',
+            select: 'routeOfTrip',
+            options: {
+              $text: { $search: query.textSearch },
+            },
           });
+        /** http://mongoosejs.com/docs/api.html#querystream_QueryStream */
+        if (!result) {
+          socket.emit('resultSearch', {
+            type: 'RESULT_SEARCH_ERROR',
+            error: 'Ko Tim duoc ket qua',
+          });
+        }
+        socket.emit('resultSearch', {
+          type: 'RESULT_SEARCH_SUCCESS',
+          result,
+        });
         //}
         // } else{
         //       /** sử dụng regex của javascript để tìm kiếm gần đúng  */
@@ -141,9 +140,11 @@ export const clientSocket = io => {
         //       kqSearch,
         //     });
         // }
-
       } catch (err) {
-        socket.emit('resultSearch', { type: 'RESULT_SEARCH_ERROR', error: err });
+        socket.emit('resultSearch', {
+          type: 'RESULT_SEARCH_ERROR',
+          error: err,
+        });
       }
     });
     /** Load chi tiet chuyen */
@@ -186,13 +187,18 @@ export const clientSocket = io => {
 
     /** pick chuyen -- dang ki ve xe */
     socket.on('pickchuyenxe', async info => {
-      console.log('===============================');
+      console.log('================thong tin pick chuyen===============');
       console.log(info);
       console.log('===============================');
       if (!info.userid) {
         return;
       }
-      const codeTicket = info.idchuyen + crypto.randomBytes(2).toString('hex').toUpperCase();
+      const codeTicket =
+        info.idchuyen +
+        crypto
+          .randomBytes(2)
+          .toString('hex')
+          .toUpperCase();
       const ticket = {
         codeTicket,
         dateOfStart: info.dateOfStart,
@@ -210,12 +216,13 @@ export const clientSocket = io => {
       if (!client) {
         return;
       }
+      const chuyenXe = await chuyenxeModel.findById(info.idchuyen);
 
       const newTicket = await TicketModel.createTicket(ticket, info.userid);
       if (client.acount_payment.balance >= newTicket.price) {
         client.acount_payment.balance =
           client.acount_payment.balance - newTicket.price;
-        client.acount_payment.history_transaction.push(newTicket_id);
+        client.acount_payment.history_transaction.push(newTicket._id);
         newTicket.typeTicket = 'DATVE';
         newTicket.isPayed = true;
       } else {
@@ -226,17 +233,11 @@ export const clientSocket = io => {
       const arrPromise = await Promise.all([
         client.save(),
         newTicket.save(),
-        chuyenxeModel.findByIdAndUpdate(
-          info.idchuyen,
-          {
-            $push: { ticketsInChuyen: info.idchuyen },
-          },
-          { new: true },
-        ),
+        chuyenXe.handlePickChuyen.pickChuyen(newTicket._id),
       ]);
       //const kqClientSave= arrPromise[0];
       const kqTicketCreate = arrPromise[1];
-      const updateChuyen= arrPromise[2];
+      const updateChuyen = arrPromise[2];
       if (!kqTicketCreate) {
         socket.emit('pickResult', {
           type: 'BOOK_CHUYEN_ERROR',
@@ -248,7 +249,10 @@ export const clientSocket = io => {
         type: 'BOOK_CHUYEN_SUCCESS',
         result: kqTicketCreate,
       });
-      socket.broadcast.emit('listChuyenChanged',{idChuyen: updateChuyen._id, dadat: updateChuyen.dadat});
+      socket.broadcast.emit('listChuyenChanged', {
+        idChuyen: updateChuyen._id,
+        dadat: updateChuyen.dadat,
+      });
       console.log('===============================');
       console.log(listchuyen.length);
       console.log('===============================');
@@ -261,9 +265,11 @@ export const clientSocket = io => {
       const arrPromise = await Promise.all([
         TicketModel.findById(ticketID),
         ClientModel.findById(clientID),
+        chuyenxeModel.findById(chuyenxeID),
       ]);
       const ticketResult = arrPromise[0];
       const clientResult = arrPromise[1];
+      const chuyenResult = arrPromise[2];
 
       const typeTicket = ticketResult.typeTicket;
       if (typeTicket === 'GIUCHO') {
@@ -288,6 +294,7 @@ export const clientSocket = io => {
       const arrPromiseSaved = await Promise.all([
         ticketResult.save(),
         clientResult.save(),
+        chuyenResult.handlePickChuyen.cancelChuyen(ticketID),
       ]);
       const clientAfterSave = arrPromiseSaved[1],
         ticketAffterSave = arrPromiseSaved[0];

@@ -25,9 +25,10 @@ export async function getAllTicket(req, res, next) {
         message: 'Ban khong co quyen truy cap chuc nang nay',
       });
     }
-    return res
-      .status(HTTPStatus.OK)
-      .json({ err: false, result: await TicketModel.find() });
+    const result = await TicketModel.find()
+      .populate('inChuyenXe')
+      .populate('Customer', 'info.fullname');
+    return res.status(HTTPStatus.OK).json({ err: false, result });
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
     return next(err);
@@ -42,12 +43,29 @@ export async function getTicketInfo(req, res, next) {
       'Customer',
     );
     if (!info) {
-      return res
-        .status(HTTPStatus.BAD_REQUEST)
-        .json({
-          err: true,
-          message: 'Khong tim thay ve hoac khong ton tai ve nay',
-        });
+      return res.status(HTTPStatus.BAD_REQUEST).json({
+        err: true,
+        message: 'Khong tim thay ve hoac khong ton tai ve nay',
+      });
+    }
+    return res.status(HTTPStatus.OK).json({ err: false, result: info });
+  } catch (err) {
+    err.status = HTTPStatus.BAD_REQUEST;
+    return next(err);
+  }
+}
+export async function getTicketbyID(req, res, next) {
+  const whitelist = ['mave'];
+  const body = filteredBody(req.body, whitelist);
+  try {
+    const info = await TicketModel.findById(body.mave)
+      .populate('inChuyenXe')
+      .populate('Customer', 'info.fullname');
+    if (!info) {
+      return res.status(HTTPStatus.BAD_REQUEST).json({
+        err: true,
+        message: 'Khong tim thay ve hoac khong ton tai ve nay',
+      });
     }
     return res.status(HTTPStatus.OK).json({ err: false, result: info });
   } catch (err) {

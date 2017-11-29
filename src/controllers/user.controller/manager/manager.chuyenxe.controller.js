@@ -53,3 +53,24 @@ export async function getFullInfoChuyen(req, res, next) {
     return next(err);
   }
 }
+export async function getFullInfoChuyenID(req, res, next) {
+  const body = filteredBody(req.params, ['id']);
+  try {
+    const ketqua = await ChuyenxeModel.findById(body.id)
+      .populate('routeOfTrip')
+      .populate('thanhtrakiemtra')
+      .populate('laixevaphuxe')
+      .populate('coach')
+      .populate('ticketsInChuyen')
+      .populate('danhgia.khachhang', 'info.fullname');
+    if (!ketqua) {
+      return res
+        .status(HTTPStatus.BAD_REQUEST)
+        .json({ err: true, message: 'Xuat hien loi tu truy van cua ban' });
+    }
+    return res.status(HTTPStatus.OK).json({ err: false, result: ketqua });
+  } catch (err) {
+    err.status = HTTPStatus.BAD_REQUEST;
+    return next(err);
+  }
+}
