@@ -11,6 +11,7 @@ import managerCoach from './user.router/manager.coach.router';
 import managerTicket from './user.router/manager.ticket.router';
 import managerChuyenXe from './user.router/manager.chuyenxe.router';
 import managerTuyen from './user.router/manager.lotrinh.router';
+import managerLog from './user.router/manager.log.router';
 
 import seedingRoute from './seeding';
 
@@ -58,6 +59,11 @@ routes.use('/manager/chuyenxe', managerChuyenXe);
  * quan li tuyen xe
  */
 routes.use('/manager/tuyen', managerTuyen);
+
+/**
+ * quan li log
+ */
+routes.use('/manager/log', managerLog);
 
 routes.all('*', (req, res, next) => {
   next(new APIError('Not Found!', HTTPStatus.NOT_FOUND, true));

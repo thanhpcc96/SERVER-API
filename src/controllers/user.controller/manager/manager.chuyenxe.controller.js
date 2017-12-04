@@ -3,6 +3,7 @@ import Joi from 'joi';
 import ChuyenxeModel from '../../../models/chuyenxe.model';
 import { filteredBody } from '../../../ultils/filterBody';
 import monent from 'moment';
+import agenda from '../../../jobLoader';
 
 export const validation = {
   getFullInfoChuyen: {
@@ -19,13 +20,17 @@ export async function getAllChuyen(req, res, next) {
         .status(HTTPStatus.UNAUTHORIZED)
         .json({ err: true, message: 'Ban khong co quyen' });
     }
-    const result = await ChuyenxeModel.find({ timeStart: { $gte : monent().subtract(1,'day')}});
+    const result = await ChuyenxeModel.find({
+      timeStart: { $gte: monent().subtract(1, 'day') },
+    });
     if (!result) {
       return res
         .status(HTTPStatus.NOT_FOUND)
         .json({ err: true, message: 'Khong co ket qua' });
     }
-    return res.status(HTTPStatus.OK).json({ err: false, lenght:result.length, result });
+    return res
+      .status(HTTPStatus.OK)
+      .json({ err: false, lenght: result.length, result });
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
     return next(err);
@@ -35,7 +40,7 @@ export async function getAllChuyen(req, res, next) {
 export async function getFullInfoChuyen(req, res, next) {
   const body = filteredBody(req.body, ['tenchuyen']);
   try {
-    const ketqua = await ChuyenxeModel.findOne({tenchuyen: body.sochuyen})
+    const ketqua = await ChuyenxeModel.findOne({ tenchuyen: body.sochuyen })
       .populate('routeOfTrip')
       .populate('thanhtrakiemtra')
       .populate('laixevaphuxe')
@@ -72,5 +77,31 @@ export async function getFullInfoChuyenID(req, res, next) {
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
     return next(err);
+  }
+}
+
+export async function _disablePickTicketOnline(req, res, next) {
+  try {
+    const idChuyen = req.body.idchuyen;
+    const chuyen = await ChuyenxeModel.findById(idChuyen);
+    chuyen.disablePick = !chuyen.disablePick;
+    agenda.now('savelog', {
+      user: req.user._id,
+      action: { name: 'Hủy đăng kí chuyến online', detail: [{ chuyenID: idChuyen }] },
+      status: 'FAIL',
+      time: Date.now()
+    });
+    return res
+      .status(HTTPStatus.OK)
+      .json({ err: false, result: await chuyen.save() });
+  } catch (error) {
+    agenda.now('savelog', {
+      user: req.user._id,
+      action: { name: 'Hủy đăng kí chuyến online' },
+      status: 'FAIL',
+      time: Date.now()
+    });
+    error.status = HTTPStatus.BAD_REQUEST;
+    next(error);
   }
 }

@@ -1,7 +1,9 @@
 import HTTPStatus from 'http-status';
 import Joi from 'joi';
+import agenda from '../../../jobLoader';
 
 import Client from '../../../models/client.model';
+import RecordModel from '../../../models/activity.log.model';
 import constants from '../../../config/constants';
 import { filteredBody } from '../../../ultils/filterBody';
 
@@ -108,16 +110,30 @@ export async function _putRechairCoin(req, res, next) {
     }
     const oldBalace = client.acount_payment.balance;
     client.acount_payment.balance = oldBalace + parseInt(body.amount, 0);
-    client.acount_payment.history_recharge.push({
+    const infoRechair = {
       rechargeTime: Date.now(),
       idUser: user._id, // Id nhan vien nhan tien
       amountSend: parseInt(body.amount, 0),
       oldBalace,
+    };
+    client.acount_payment.history_recharge.push(infoRechair);
+    agenda.now('savelog', {
+      user: user._id,
+      action: {
+        name: 'Nạp tiền tài khoản',
+        detail: [{ ...infoRechair, client: body.idclient }],
+      },
+      status: 'SUCCESS',
     });
     return res
       .status(HTTPStatus.OK)
       .json({ err: false, result: await client.save() });
   } catch (err) {
+    agenda.now('savelog', {
+      user: req.user._id,
+      action: { name: 'Nạp tiền tài khoản' },
+      status: 'FAIL',
+    });
     err.status = HTTPStatus.BAD_REQUEST;
     return next(err);
   }

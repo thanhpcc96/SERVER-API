@@ -95,6 +95,9 @@ const ClientUserSchema = new Schema(
       type: Number,
       default: 10
     },
+    tokenPush:{
+      type: String
+    },
     status: String // ACTIVE, DEACTIVE, SUSPENDED
   },
   { timestamps: true }

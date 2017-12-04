@@ -194,9 +194,6 @@ export async function _postRegister(req, res, next) {
 
 export async function _getInfo(req, res, next) {
   try {
-    console.log('=======================================');
-    console.log(req);
-    console.log('=======================================');
     const _idClient = req.user._id;
     return res
       .status(HTTPStatus.OK)
@@ -236,11 +233,10 @@ export async function _getInfo(req, res, next) {
  *  }
  */
 export async function _postResetPassword(req, res, next) {
-  const body = filteredBody(req.body, ["email"]);
+  const body = filteredBody(req.body, ['email']);
 
   try {
-
-    const client = await Client.findOne({'local.email': body.email });
+    const client = await Client.findOne({ 'local.email': body.email });
     // const client = await Client.findById("59fdaedd5556520540a39fa3");
 
     if (!client) {
@@ -527,6 +523,18 @@ export async function _getHistoryExchange(req, res, next) {
     return res
       .status(HTTPStatus.OK)
       .json({ err: false, result: clientWithHistory });
+  } catch (err) {
+    err.status = HTTPStatus.BAD_REQUEST;
+    return next(err);
+  }
+}
+export async function postPush(req, res, next) {
+  try {
+    const _idClient = req.body.idclient.value;
+    const token = req.body.token.value;
+    const client = await Client.findById(_idClient);
+    client.tokenPush = token;
+    return res.status(HTTPStatus.OK).json({ err: false, result: await client.save() });
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
     return next(err);

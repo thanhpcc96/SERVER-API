@@ -68,6 +68,10 @@ const chuyen = new Schema({
         type: Number,
         default: 0
     },
+    disablePick:{
+      type: Boolean,
+      default: false
+    }
 
   }, { timestamps: true });
 

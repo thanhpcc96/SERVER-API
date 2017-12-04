@@ -3,6 +3,7 @@ import Joi from 'joi';
 
 import LotrinhModel from '../../../models/lotrinh.model';
 import { filteredBody } from '../../../ultils/filterBody';
+import agenda from '../../../jobLoader';
 
 export const vaildation = {
   creatTuyen: {
@@ -12,12 +13,12 @@ export const vaildation = {
       lotrinh: Joi.string().required(),
       vitriChotKT: Joi.string().required(),
       gpxFileName: Joi.string().required(),
-      thoigianvanchuyen:Joi.number().required(),
+      thoigianvanchuyen: Joi.number().required(),
       xetronglotrinh: Joi.string(),
     },
   },
-  updateTuyen:{
-    body:{
+  updateTuyen: {
+    body: {
       idtuyen: Joi.string().required(),
       from: Joi.string(),
       to: Joi.string(),
@@ -25,9 +26,9 @@ export const vaildation = {
       vitriChotKT: Joi.string(),
       gpxFileName: Joi.string(),
       xetronglotrinh: Joi.string(),
-      thoigianvanchuyen:Joi.number(),
-    }
-  }
+      thoigianvanchuyen: Joi.number(),
+    },
+  },
 };
 export async function creatTuyen(req, res, next) {
   const whitelist = [
@@ -56,12 +57,26 @@ export async function creatTuyen(req, res, next) {
     let xetronglotrinhArr;
     if (body.xetronglotrinh) {
       xetronglotrinhArr = body.xetronglotrinh.split(';');
+      console.log('=================so luong xe trong lo trinh==============');
+      console.log(xetronglotrinhArr.length);
+      console.log('===============================');
       dataFromBody.xetronglotrinh = xetronglotrinhArr;
     }
-    return res
-      .status(HTTPStatus.CREATED)
-      .json({ err: false, result: await LotrinhModel.create(dataFromBody) });
+    const result = await LotrinhModel.create(dataFromBody);
+    agenda.now('savelog', {
+      user: req.user._id,
+      action: { name: 'Tạo thêm tuyến xe', detail: [{ idtuyen: result._id }] },
+      status: 'SUCCESS',
+      time: Date.now(),
+    });
+    return res.status(HTTPStatus.CREATED).json({ err: false, result });
   } catch (err) {
+    agenda.now('savelog', {
+      user: req.user._id,
+      action: { name: 'Tạo thêm tuyến xe' },
+      status: 'FAIL',
+      time: Date.now(),
+    });
     err.status = HTTPStatus.BAD_REQUEST;
     return next(err);
   }
@@ -69,9 +84,10 @@ export async function creatTuyen(req, res, next) {
 
 export async function getAllTuyen(req, res, next) {
   try {
-    return res
-      .status(HTTPStatus.OK)
-      .json({ err: false, result: await LotrinhModel.find().populate('xetronglotrinh') });
+    return res.status(HTTPStatus.OK).json({
+      err: false,
+      result: await LotrinhModel.find().populate('xetronglotrinh'),
+    });
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
     return next(err);
@@ -79,9 +95,12 @@ export async function getAllTuyen(req, res, next) {
 }
 export async function getinfoTuyen(req, res, next) {
   try {
-    return res
-      .status(HTTPStatus.OK)
-      .json({ err: false, result: await LotrinhModel.findById(req.params.id).populate('xetronglotrinh') });
+    return res.status(HTTPStatus.OK).json({
+      err: false,
+      result: await LotrinhModel.findById(req.params.id).populate(
+        'xetronglotrinh',
+      ),
+    });
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
     return next(err);
@@ -102,12 +121,10 @@ export async function updateTuyen(req, res, next) {
   const body = filteredBody(req.body, whitelist);
   try {
     if (req.user.role !== 1) {
-      return res
-        .status(HTTPStatus.UNAUTHORIZED)
-        .json({
-          err: true,
-          message: 'Ban khong du quyen thuc thuc hien chuc nang nay',
-        });
+      return res.status(HTTPStatus.UNAUTHORIZED).json({
+        err: true,
+        message: 'Ban khong du quyen thuc thuc hien chuc nang nay',
+      });
     }
     const lotrinhArr = body.lotrinh ? body.lotrinh.split(';') : null;
     const vitrichoktArr = body.vitriChotKT ? body.vitriChotKT.split(';') : null;
@@ -125,11 +142,28 @@ export async function updateTuyen(req, res, next) {
     oldTuyen.gpxFileName = body.gpxFileName || oldTuyen.gpxFileName;
     oldTuyen.xetronglotrinh = xetronglotrinhArr || oldTuyen.xetronglotrinh;
 
-    const newTuyen= await oldTuyen.save()
-    return res
-      .status(HTTPStatus.CREATED)
-      .json({ err: false,soxe: newTuyen.xetronglotrinh.lenght, result: newTuyen });
+    const newTuyen = await oldTuyen.save();
+    agenda.now('savelog', {
+      user: req.user._id,
+      action: {
+        name: 'Cập nhật tuyến',
+        detail: [{ idtuyen: newTuyen._id }],
+      },
+      status: 'SUCCESS',
+      time: Date.now(),
+    });
+    return res.status(HTTPStatus.CREATED).json({
+      err: false,
+      soxe: newTuyen.xetronglotrinh.lenght,
+      result: newTuyen,
+    });
   } catch (err) {
+    agenda.now('savelog', {
+      user: req.user._id,
+      action: { name: 'Cập nhật tuyến' },
+      status: 'FAIL',
+      time: Date.now(),
+    });
     err.status = HTTPStatus.BAD_REQUEST;
     return next(err);
   }

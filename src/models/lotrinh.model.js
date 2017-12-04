@@ -16,7 +16,10 @@ const LotrinhSchema = new Schema(
         {
           type: String
         }
-      ]
+      ],
+      giacuoc:[{
+        type: Number
+      }]
     },
     thoigianvanchuyen: {
       type: Number,

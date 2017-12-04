@@ -5,6 +5,7 @@ import socketJWT from 'socketio-jwt';
 import momment from 'moment';
 
 import chuyenxeModel from '../models/chuyenxe.model';
+import TuyenModel from '../models/lotrinh.model';
 import TicketModel from '../models/ticket.model';
 import ClientModel from '../models/client.model';
 import couponModel from '../models/coupons.model';
@@ -45,7 +46,7 @@ export const clientSocket = io => {
         }
         const result = await chuyenxeModel
           .find({
-            //timeStart: { $gte: momment().subtract(1, 'day') },
+            //timeStart: { $gte: momment().subtract(2, 'day') },
             timeStart: { $gte: momment().add(1,'hour')}
           })
           .populate('routeOfTrip', 'routeOfTrip.lotrinh')
@@ -181,9 +182,34 @@ export const clientSocket = io => {
     });
 
     socket.on('timlotrinh', async info => {});
-    /**
-         * event pick chuyen xe
-         */
+
+    socket.on('tinhtien', async info => {
+      console.log('===============================');
+      console.log('Thực hiện tính tiền vé cho khách');
+      console.log('===============================');
+      try {
+        const { idTuyen, diemlen, diemxuong } = info;
+        const tuyenResult = await TuyenModel.findById(idTuyen);
+        const indexOfDiemLen = tuyenResult.routeOfTrip.lotrinh.indexOf(diemlen);
+        const indexOfDiemXuong = tuyenResult.routeOfTrip.lotrinh.indexOf(
+          diemxuong,
+        );
+        let giacuoc = 0;
+        if (indexOfDiemLen < indexOfDiemXuong) {
+          for (let i = indexOfDiemLen; j < indexOfDiemXuong; i++) {
+            giacuoc += tuyenResult.routeOfTrip.giacuoc[i];
+          }
+        }
+        if (indexOfDiemLen > indexOfDiemXuong) {
+          for (let i = indexOfDiemXuong; j > indexOfDiemLen; i--) {
+            giacuoc += tuyenResult.routeOfTrip.giacuoc[i];
+          }
+        }
+        socket.emit("tinhgiaResult",{type: "TINH_GIA_THANH_CONG", result: giacuoc})
+      } catch (error) {
+        socket.emit("tinhgiaResult",{type: "TINH_GIA_THAT_BAI", error})
+      }
+    });
 
     /** pick chuyen -- dang ki ve xe */
     socket.on('pickchuyenxe', async info => {

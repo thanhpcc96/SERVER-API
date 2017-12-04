@@ -10,6 +10,7 @@ const validation = managerCoach.validation;
 const route = new Router();
 
 route.get('/all', authJwt, managerCoach.getAllCoach);
+route.get('/info/:id', authJwt, managerCoach.getInfoCoach);
 
 route.post(
   '/create',
@@ -30,6 +31,11 @@ route.post(
   authJwt,
   validate(validation.updateCoach),
   managerCoach.updateCoach,
+);
+route.post(
+  '/phancong',
+  authJwt,
+  managerCoach._phanCong,
 );
 
 export default route;

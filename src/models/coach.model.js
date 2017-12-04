@@ -1,37 +1,44 @@
 import mongoose, { Schema } from 'mongoose';
 
-const coachSchema = new Schema({
+const coachSchema = new Schema(
+  {
     numberplate: {
-        type: String,
-        trim: true,
-        unique: true
+      type: String,
+      trim: true,
+      unique: true,
     },
     seat: {
-        type: Number,
-        required: [true, 'Xe can phai co cho ngoi'],
-        default: 0
+      type: Number,
+      required: [true, 'Xe can phai co cho ngoi'],
+      default: 0,
     },
     name: {
-        type: String,// VD: Hyndai Mx01
-        trim: true
+      type: String, // VD: Hyndai Mx01
+      trim: true,
     },
-    productiontime: { // thoi gian san xuat
-        type: Date,
+    productiontime: {
+      // thoi gian san xuat
+      type: Date,
     },
     photo: {
-        type: String,
-        trim: true
+      type: String,
+      trim: true,
     },
-    phutrach:{
+    phutrach: {
       laixe: {
         type: Schema.Types.ObjectId,
         ref: 'users',
       },
-      phuxe:{
+      phuxe: {
         type: Schema.Types.ObjectId,
-        ref: 'users'
-      }
-    }
-}, { timestamps: true });
+        ref: 'users',
+      },
+    },
+  },
+  { timestamps: true },
+);
+
+coachSchema.methods = {
+};
 
 export default mongoose.model('coachs', coachSchema);

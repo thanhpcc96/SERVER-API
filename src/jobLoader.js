@@ -2,13 +2,15 @@ import Agenda from 'agenda';
 
 import constants from './config/constants';
 import sendmail from './tasks/send.mail.task';
+import recordActivity from './tasks/Record.Activity.User';
 import refeshSeat from './tasks/refesh.seat.day';
 import coppyFakeGPX from './tasks/copy.gpx.file';
 
 const agenda = new Agenda({ db: { address: constants.MONGO_URL } });
 sendmail(agenda);
+recordActivity(agenda);
 // refeshSeat(agenda);
-//coppyFakeGPX(agenda);
+// coppyFakeGPX(agenda);
 // const job = agenda.create('refeshseat', {});
 
 // job.save((err) => {
@@ -16,10 +18,9 @@ sendmail(agenda);
 // });
 
 agenda.on('ready', () => {
-    agenda.start();
-    // agenda.schedule('12 : 00 am', 'refeshseat');
-   // agenda.schedule('05 : 00 am', 'copyfile');
+  agenda.start();
+  // agenda.schedule('12 : 00 am', 'refeshseat');
+  // agenda.schedule('05 : 00 am', 'copyfile');
 });
-
 
 export default agenda;

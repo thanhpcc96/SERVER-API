@@ -3,6 +3,7 @@ import Joi from 'joi';
 import { filteredBody } from '../../../ultils/filterBody';
 
 import TicketModel from '../../../models/ticket.model';
+import agenda from '../../../jobLoader';
 
 export const validation = {
   tickXeVe: {
@@ -78,17 +79,29 @@ export async function tickXeVe(req, res, next) {
   const whitelist = ['mave'];
   const body = filteredBody(req.body, whitelist);
   try {
-    const veCheckDuoc = await TicketModel.findOne({ codeTicket: body.mave });
+    const veCheckDuoc = await TicketModel.findById(body.mave);
     if (!veCheckDuoc) {
       return res
         .status(HTTPStatus.NOT_FOUND)
         .json({ err: true, message: 'Ve Khong ton tai' });
     }
     veCheckDuoc.isDoneCheck = true;
+    agenda.now('savelog', {
+      user: req.user._id,
+      action: { name: 'Xác nhận xé vé', detail: [{ idVe: veCheckDuoc._id }] },
+      status: 'SUCCESS',
+      time: Date.now(),
+    });
     return res
       .status(HTTPStatus.OK)
       .json({ err: false, result: await veCheckDuoc.save() });
   } catch (err) {
+    agenda.now('savelog', {
+      user: req.user._id,
+      action: { name: 'Xác nhận xé vé' },
+      status: 'FAIL',
+      time: Date.now(),
+    });
     err.status = HTTPStatus.BAD_REQUEST;
     return next(err);
   }

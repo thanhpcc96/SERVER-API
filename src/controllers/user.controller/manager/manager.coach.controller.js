@@ -4,7 +4,8 @@ import Joi from 'joi';
 import { filteredBody } from '../../../ultils/filterBody';
 import LotrinhModel from '../../../models/lotrinh.model';
 import CoachModel from '../../../models/coach.model';
-import ChuyenxeModel from '../../../models/coach.model';
+import UserModel from '../../../models/user.model';
+import agenda from '../../../jobLoader';
 
 export const validation = {
   createCoach: {
@@ -32,33 +33,67 @@ export const validation = {
 
 export async function getAllCoach(req, res, next) {
   try {
-    const kq= await CoachModel.find()
+    const kq = await CoachModel.find();
     return res
       .status(HTTPstatus.OK)
-      .json({ err: false, length: kq.length , result: kq });
+      .json({ err: false, length: kq.length, result: kq });
+  } catch (err) {
+    err.status = HTTPstatus.BAD_REQUEST;
+    return next(err);
+  }
+}
+export async function getInfoCoach(req, res, next) {
+  try {
+    const kq = await CoachModel.findById(req.params.id)
+      .populate('phutrach.laixe')
+      .populate('phutrach.phuxe');
+    return res
+      .status(HTTPstatus.OK)
+      .json({ err: false, length: kq.length, result: kq });
   } catch (err) {
     err.status = HTTPstatus.BAD_REQUEST;
     return next(err);
   }
 }
 export async function createCoach(req, res, next) {
-  const whiteList = ['numberplate', 'seat', 'name', 'productiontime',"idlaixe","idphuxe"];
+  const whiteList = [
+    'numberplate',
+    'seat',
+    'name',
+    'productiontime',
+    'idlaixe',
+    'idphuxe',
+  ];
   const body = filteredBody(req.body, whiteList);
-  const xe={
+  const xe = {
     numberplate: body.numberplate,
     seat: body.seat,
     name: body.name,
     productiontime: body.productiontime,
-    phutrach:{
+    phutrach: {
       laixe: body.idlaixe,
       phuxe: body.idphuxe,
-    }
-  }
+    },
+  };
   try {
-    return res
-      .status(HTTPstatus.CREATED)
-      .json({ err: false, result: await CoachModel.create(xe) });
+    const result = await CoachModel.create(xe);
+    agenda.now('savelog', {
+      user: req.user._id,
+      action: {
+        name: 'Tạo mới xe ',
+        detail: [result],
+      },
+      status: 'SUCCESS',
+      time: Date.now(),
+    });
+    return res.status(HTTPstatus.CREATED).json({ err: false, result });
   } catch (err) {
+    agenda.now('savelog', {
+      user: req.user._id,
+      action: { name: 'Tạo mới xe' },
+      status: 'FAIL',
+      time: Date.now(),
+    });
     err.status = HTTPstatus.BAD_REQUEST;
     return next(err);
   }
@@ -68,10 +103,22 @@ export async function deleteCoach(req, res, next) {
   const body = filteredBody(req.body, 'numberplate');
   try {
     await CoachModel.findOneAndRemove({ numberplate: body.numberplate });
+    agenda.now('savelog', {
+      user: req.user._id,
+      action: { name: 'Tạo mới xe' },
+      status: 'SUCCESS',
+      time: Date.now(),
+    });
     return res
       .status(HTTPstatus.OK)
       .json({ err: false, message: 'Da xoa thanh cong' });
   } catch (err) {
+    agenda.now('savelog', {
+      user: req.user._id,
+      action: { name: 'Xóa xe' },
+      status: 'FAIL',
+      time: Date.now(),
+    });
     err.status = HTTPstatus.BAD_REQUEST;
     return next(err);
   }
@@ -86,11 +133,54 @@ export async function updateCoach(req, res, next) {
     oldCoach.seat = body.seat || oldCoach.seat;
     oldCoach.name = body.name || oldCoach.name;
     oldCoach.productiontime = body.productiontime || oldCoach.productiontime;
+    agenda.now('savelog', {
+      user: req.user._id,
+      action: {
+        name: 'Cập nhật thông tin xe',
+        detail: [{ xeID: oldCoach._id }],
+      },
+      status: 'SUCCESS',
+      time: Date.now(),
+    });
     return res
       .status(HTTPstatus.OK)
       .json({ err: false, result: await oldCoach.save() });
   } catch (err) {
+    agenda.now('savelog', {
+      user: req.user._id,
+      action: { name: 'Cập nhật thông tin xe' },
+      status: 'FAIL',
+      time: Date.now(),
+    });
     err.status = HTTPstatus.BAD_REQUEST;
     return next(err);
+  }
+}
+
+/**
+ *
+*/
+export async function _phanCong(req, res, next) {
+  const body = filteredBody(req.body, ['idxe', 'idlaixe', 'idphuxe']);
+  try {
+    const ketqua = await CoachModel.findById(body.idxe);
+    const laixe = await UserModel.findById(body.idlaixe);
+    const phuxe = await UserModel.findById(body.idphuxe);
+    if (!ketqua) {
+      return res
+        .status(HTTPstatus.NOT_FOUND)
+        .json({ err: true, message: 'Không tìm thấy xe' });
+    }
+    ketqua.phutrach.laixe = body.idlaixe;
+    ketqua.phutrach.phuxe = body.idphuxe;
+    laixe.xephancong = body.idxe;
+    phuxe.xephancong = body.idxe;
+    await Promise.all([laixe.save(), phuxe.save()]);
+    return res
+      .status(HTTPstatus.OK)
+      .json({ err: false, result: await ketqua.save() });
+  } catch (error) {
+    error.status = HTTPstatus.BAD_REQUEST;
+    next(error);
   }
 }

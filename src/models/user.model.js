@@ -143,6 +143,7 @@ UserSchema.methods = {
     return {
       _id: this._id,
       email: this.email,
+      name: this.info.fullname,
       token: `JWT ${this.createToken()}`,
     };
   },

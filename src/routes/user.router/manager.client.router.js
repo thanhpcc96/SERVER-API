@@ -43,7 +43,7 @@ route.get(
  */
 route.post(
   "/rechair",
-  authJwt,
+
   validate(validation.rechairCoin),
   controller._putRechairCoin
 );

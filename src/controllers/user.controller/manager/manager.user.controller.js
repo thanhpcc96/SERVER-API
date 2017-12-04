@@ -192,7 +192,7 @@ export async function _uploadFile(req, res, next) {
         .status(HTTPStatus.BAD_REQUEST)
         .json({ err: true, message: 'Loi roi' });
     }
-    const  f= req.files[0];
+    const f = req.files[0];
     console.log('================file===============');
     console.log(f);
     console.log('===============================');
@@ -200,8 +200,8 @@ export async function _uploadFile(req, res, next) {
       err: false,
       result: await User.findByIdAndUpdate(
         nhanvienID,
-        { 'info.photoProfile':f.location },
-        { 'new': true },
+        { 'info.photoProfile': f.location },
+        { new: true },
       ),
     });
   } catch (err) {
@@ -211,7 +211,10 @@ export async function _uploadFile(req, res, next) {
 }
 
 export async function _postUpdateInfo(req, res, next) {
-  const body = filteredBody(req.body, [...constants.WHITELIST.manager.updateInfo,"iduser"]);
+  const body = filteredBody(req.body, [
+    ...constants.WHITELIST.manager.updateInfo,
+    'iduser',
+  ]);
   try {
     const id = body.iduser;
     if (req.user.role !== 1) {
@@ -224,11 +227,12 @@ export async function _postUpdateInfo(req, res, next) {
 
     userCurrent.info.fullname = body.fullname || userCurrent.info.fullname;
     userCurrent.info.address = body.address || userCurrent.info.address;
-    userCurrent.info.passportNumber = body.passport || userCurrent.info.passportNumber;
+    userCurrent.info.passportNumber =
+      body.passport || userCurrent.info.passportNumber;
     userCurrent.info.dateofbirth =
       body.dateofbirth || userCurrent.info.dateofbirth;
     userCurrent.info.phone = body.phone || userCurrent.info.phone;
-    userCurrent.role= body.role || userCurrent.role;
+    userCurrent.role = body.role || userCurrent.role;
     res
       .status(HTTPStatus.OK)
       .json({ err: false, result: await userCurrent.save() });
@@ -238,36 +242,40 @@ export async function _postUpdateInfo(req, res, next) {
   }
 }
 
-export async function _getListLaiXeChuaPhanCong(req,res,next){
+export async function _getListLaiXeChuaPhanCong(req, res, next) {
   try {
-    const kq=[];
-    const listResult= await User.find({role : 2});
-    listResult.forEach(user=>{
-      if(!user.xephancong){
-          kq.push(user);
+    const kq = [];
+    const listResult = await User.find({ role: 2 });
+    listResult.forEach(user => {
+      if (!user.xephancong) {
+        kq.push(user);
       }
     });
-    return res.status(HTTPStatus.OK).json({err: false, result: kq});
+    return res
+      .status(HTTPStatus.OK)
+      .json({ err: false, soluong: kq.length, result: kq });
   } catch (error) {
-    error.status= HTTPStatus.BAD_REQUEST;
+    error.status = HTTPStatus.BAD_REQUEST;
     next(error);
   }
 }
-export async function _getListPhuXeChuaPhanCong(req,res,next){
+export async function _getListPhuXeChuaPhanCong(req, res, next) {
   try {
-    const kq=[];
-    const listResult= await User.find({role : 3});
-    listResult.forEach(user=>{
-      if(!user.xephancong){
-          kq.push(user);
+    const kq = [];
+    const listResult = await User.find({ role: 3 });
+    listResult.forEach(user => {
+      if (!user.xephancong) {
+        kq.push(user);
       }
     });
     console.log('===============================');
     console.log(kq);
     console.log('===============================');
-    return res.status(HTTPStatus.OK).json({err: false, result: kq});
+    return res
+      .status(HTTPStatus.OK)
+      .json({ err: false, soluong: kq.length, result: kq });
   } catch (error) {
-    error.status= HTTPStatus.BAD_REQUEST;
+    error.status = HTTPStatus.BAD_REQUEST;
     next(error);
   }
 }

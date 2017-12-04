@@ -19,19 +19,15 @@ export const validation = {
   },
   updateInfo: {
     body: {
-      firstname: Joi.string(),
-      lastname: Joi.string(),
-      address: Joi.string(),
-      dateofbirth: Joi.date(),
-      phone: Joi.string().regex(/^[0-9-+]+$/),
+      // fullname: Joi.string(),
+      // address: Joi.string(),
+      // dateofbirth: Joi.date(),
+      // phone: Joi.string().regex(/^[0-9-+]+$/),
     },
   },
   updatePassWord: {
     body: {
       password: Joi.string()
-        .min(6)
-        .required(),
-      newpassword: Joi.string()
         .min(6)
         .required(),
     },
@@ -98,8 +94,7 @@ export async function _postUpdateInfo(req, res, next) {
       });
     }
     const userCurrent = await UserModel.findById(id);
-    userCurrent.info.firtname = body.firtname || userCurrent.info.firtname;
-    userCurrent.info.lastname = body.lastname || userCurrent.info.lastname;
+    userCurrent.info.fullname = body.fullname || userCurrent.info.fullname;
     userCurrent.info.address = body.address || userCurrent.info.address;
     userCurrent.info.dateofbirth =
       body.dateofbirth || userCurrent.info.dateofbirth;
@@ -123,12 +118,12 @@ export async function _postUpdatePass(req, res, next) {
   try {
     const idUser = req.user._id;
     const userCurrent = await UserModel.findById(idUser);
-    if (!userCurrent.authenticateUser(body.password)) {
-      return res
-        .status(HTTPStatus.NON_AUTHORITATIVE_INFORMATION)
-        .json({ err: true, message: 'Mat khau cu khong trung khop' });
-    }
-    userCurrent.password = body.newpassword;
+    // if (!userCurrent.authenticateUser(body.password)) {
+    //   return res
+    //     .status(HTTPStatus.NON_AUTHORITATIVE_INFORMATION)
+    //     .json({ err: true, message: 'Mat khau cu khong trung khop' });
+    // }
+    userCurrent.password = body.password;
     return res
       .status(HTTPStatus.OK)
       .json({ err: false, result: await userCurrent.save() });

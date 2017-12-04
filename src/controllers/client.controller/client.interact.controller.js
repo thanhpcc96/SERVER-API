@@ -39,13 +39,19 @@ export async function _getAvaiableTicket(req, res, next) {
         match: { timeEnd: { $gt: Date.now() } },
       })
       .populate('Customer', 'info.fullname');
+    const listVe = [];
+    listicket.forEach(ticket => {
+      if (ticket.inChuyenXe !== null) {
+        listVe.push(ticket);
+      }
+    });
     if (!listicket) {
       return res.status(HTTPStatus.BAD_REQUEST).json({
         error: true,
         message: 'Khong the hoan thanh thao tac banj vu yeu cau',
       });
     }
-    return res.status(HTTPStatus.OK).json({ err: false, result: listicket });
+    return res.status(HTTPStatus.OK).json({ err: false, result: listVe });
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
     next(err);
@@ -138,9 +144,18 @@ export async function _getHistoryTransction(req, res, next) {
   try {
     const idClient = req.user._id;
     const fullInfo = await Client.findById(idClient)
-      .populate('acount_payment.history_transaction')
-      .populate('acount_payment.history_pick_keep_seat')
-      .populate('acount_payment.history_cancel_ticket');
+      .populate({
+        path: 'acount_payment.history_transaction',
+        options: { sort: { created_at: -1 } },
+      })
+      .populate({
+        path: 'acount_payment.history_pick_keep_seat',
+        options: { sort: { created_at: -1 } },
+      })
+      .populate({
+        path: 'acount_payment.history_cancel_ticket',
+        options: { sort: { created_at: -1 } },
+      });
     if (!fullInfo) {
       return res
         .status(HTTPStatus.BAD_REQUEST)

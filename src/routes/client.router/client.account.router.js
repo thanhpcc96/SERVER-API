@@ -65,5 +65,9 @@ route.get(
   authJwt,
   acountClientController._getHistoryExchange
 );
+route.post(
+  "/updatepush",
+  acountClientController.postPush
+);
 
 export default route;
