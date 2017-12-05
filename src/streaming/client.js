@@ -13,8 +13,8 @@ import couponModel from '../models/coupons.model';
 import execTracking from './fakeTracking';
 
 export const clientSocket = io => {
-  const clientIO = io.of('/client');
-  clientIO.on('connection', socket => {
+  // const clientIO = io.of('/client');
+  io.on('connection', socket => {
     console.log('==============sock client=================');
     console.log('vao dk client sock');
     console.log('===============================');
