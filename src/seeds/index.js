@@ -5,6 +5,10 @@ import {
   generateChuyenInDay,
 } from './chuyenxe.seed';
 
+import {
+  _seed_phancong
+}from './phancong.seed'
+
 export {
   userSeed,
   clientSeed,
@@ -12,4 +16,5 @@ export {
   createChuyenXeSeed,
   deleteAllChuyen,
   generateChuyenInDay,
+  _seed_phancong
 };

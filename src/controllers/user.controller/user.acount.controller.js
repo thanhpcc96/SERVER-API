@@ -99,7 +99,7 @@ export async function _postUpdateInfo(req, res, next) {
     userCurrent.info.dateofbirth =
       body.dateofbirth || userCurrent.info.dateofbirth;
     userCurrent.info.phone = body.phone || userCurrent.info.phone;
-    res
+    return res
       .status(HTTPStatus.OK)
       .json({ err: false, result: await userCurrent.save() });
   } catch (err) {

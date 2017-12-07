@@ -144,6 +144,7 @@ UserSchema.methods = {
       _id: this._id,
       email: this.email,
       name: this.info.fullname,
+      role: this.role,
       token: `JWT ${this.createToken()}`,
     };
   },
@@ -159,5 +160,10 @@ UserSchema.methods = {
   //         token: this.createToken()
   //     };
   // },
+
+  removeXePhanCong(){
+    this.xephancong=null;
+    return this.save();
+  }
 };
 export default mongoose.model('users', UserSchema);

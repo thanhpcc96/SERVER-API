@@ -1,7 +1,14 @@
 import HTTPStatus from 'http-status';
 
-import { clientSeed, deleteAllClient, createChuyenXeSeed, deleteAllChuyen, generateChuyenInDay, userSeed} from '../seeds';
-
+import {
+  clientSeed,
+  deleteAllClient,
+  createChuyenXeSeed,
+  deleteAllChuyen,
+  generateChuyenInDay,
+  userSeed,
+  _seed_phancong,
+} from '../seeds';
 
 export async function _getClientSeeds(req, res, next) {
   try {
@@ -16,8 +23,8 @@ export async function _getClientSeeds(req, res, next) {
 }
 export async function getUserSeeds(req, res, next) {
   try {
-      await userSeed(req.params.role);
-      return res
+    await userSeed(req.params.role);
+    return res
       .status(HTTPStatus.OK)
       .send(`Seed thành công! Đã tạo 32 nhan vien`);
   } catch (err) {
@@ -60,9 +67,18 @@ export async function _deleteAllChuyen(req, res, next) {
 export async function _generateChuyenInDay(req, res, next) {
   try {
     await generateChuyenInDay();
-    return res.status(HTTPStatus.OK).json({res: "ok"});
+    return res.status(HTTPStatus.OK).json({ res: 'ok' });
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
     return next(err);
+  }
+}
+export async function _generratePhanCong(req, res, next) {
+  try {
+    await _seed_phancong();
+    return res.status(HTTPStatus.OK).json({ message: 'Phan cong thanh cong' });
+  } catch (error) {
+    error.status = HTTPStatus.BAD_REQUEST;
+    next(error);
   }
 }

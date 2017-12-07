@@ -33,7 +33,7 @@ export async function _getAvaiableTicket(req, res, next) {
   // .populate('acount_payment.history_cancel_ticket');
   try {
     const idClient = req.user._id;
-    const listicket = await Ticket.find({ Customer: idClient })
+    const listicket = await Ticket.find({ Customer: idClient, isAvaiable: false, isDoneCheck: false })
       .populate({
         path: 'inChuyenXe',
         match: { timeEnd: { $gt: Date.now() } },

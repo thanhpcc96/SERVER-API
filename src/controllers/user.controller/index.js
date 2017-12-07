@@ -5,6 +5,7 @@ import * as managerTicket from './manager/manager.ticket.controller';
 import * as managerChuyenXe from './manager/manager.chuyenxe.controller';
 import * as managerLotrinh from './manager/manager.lotrinh.constroller';
 import * as managerLog from './manager/manager.history.controller';
+import * as managerPhancong from './manager/manager.phancong.controller'
 
 import * as acountController from './user.acount.controller';
 
@@ -17,5 +18,6 @@ const userController = {
   managerLotrinh,
   acountController,
   managerLog,
+  managerPhancong
 };
 export default userController;

@@ -13,7 +13,7 @@ export async function createChuyenXeSeed() {
     console.log('================kq lotrinh===============');
     console.log(listLoTrinh.length);
     console.log('===============================');
-    for(let n= 0; n< listLoTrinh.length; n++) {
+    for (let n = 0; n < listLoTrinh.length; n++) {
       // if (4 * lotrinh.thoigianvanchuyen !== lotrinh.xetronglotrinh.length) {
       //   console.log('err ne')
       //   return new Error('Xe tham gia trong chuyen khong du de phan cong');
@@ -23,12 +23,12 @@ export async function createChuyenXeSeed() {
       console.log(listLoTrinh);
       console.log('===============================');
       for (let j = 0; j < 7; j++) {
-        let chuyendi=[];
-        let chuyenve =[];
+        let chuyendi = [];
+        let chuyenve = [];
         for (let i = 6; i <= 17; i++) {
           const chuyenDi1 = {
-            tenchuyen: `${listLoTrinh[n].routeOfTrip.from}-${listLoTrinh[n].routeOfTrip
-              .to}:${i}:00 `,
+            tenchuyen: `${listLoTrinh[n].routeOfTrip.from}-${listLoTrinh[n]
+              .routeOfTrip.to}:${i}:00 `,
             timeStart: moment()
               .add(j, 'day')
               .set({ hour: i, minute: 0, second: 0 }),
@@ -48,8 +48,8 @@ export async function createChuyenXeSeed() {
             loai: 'DI',
           };
           const chuyenDi2 = {
-            tenchuyen: `${listLoTrinh[n].routeOfTrip.from}-${listLoTrinh[n].routeOfTrip
-              .to}:${i}:30 `,
+            tenchuyen: `${listLoTrinh[n].routeOfTrip.from}-${listLoTrinh[n]
+              .routeOfTrip.to}:${i}:30 `,
             timeStart: moment()
               .add(j, 'day')
               .set({ hour: i, minute: 30, second: 0 }),
@@ -69,8 +69,8 @@ export async function createChuyenXeSeed() {
             loai: 'DI',
           };
           const chuyenVe1 = {
-            tenchuyen: `${listLoTrinh[n].routeOfTrip.to}-${listLoTrinh[n].routeOfTrip
-              .from}:${i}:00 `,
+            tenchuyen: `${listLoTrinh[n].routeOfTrip.to}-${listLoTrinh[n]
+              .routeOfTrip.from}:${i}:00 `,
             timeStart: moment()
               .add(j, 'day')
               .set({ hour: i, minute: 0 }),
@@ -90,8 +90,8 @@ export async function createChuyenXeSeed() {
             loai: 'DI',
           };
           const chuyenVe2 = {
-            tenchuyen: `${listLoTrinh[n].routeOfTrip.to}-${listLoTrinh[n].routeOfTrip
-              .from}:${i}:30 `,
+            tenchuyen: `${listLoTrinh[n].routeOfTrip.to}-${listLoTrinh[n]
+              .routeOfTrip.from}:${i}:30 `,
             timeStart: moment()
               .add(j, 'day')
               .set({ hour: i, minute: 30 }),
@@ -110,10 +110,10 @@ export async function createChuyenXeSeed() {
             tinhtrang: [],
             loai: 'DI',
           };
-          chuyendi.push(...[chuyenDi1,chuyenDi2])
-          chuyenve.push(...[chuyenVe1,chuyenVe2]);
+          chuyendi.push(...[chuyenDi1, chuyenDi2]);
+          chuyenve.push(...[chuyenVe1, chuyenVe2]);
         }
-        if(j%2 === 0){
+        if (j % 2 === 0) {
           for (let i = 0; i < listLoTrinh[n].xetronglotrinh.length / 2; i++) {
             for (let m = i; j < chuyendi.length; j++) {
               chuyendi[m].coach = listLoTrinh[n].xetronglotrinh[i];
@@ -136,7 +136,7 @@ export async function createChuyenXeSeed() {
               chuyendi[f].coach = listLoTrinh[n].xetronglotrinh[i];
             }
           }
-        }else{
+        } else {
           for (let i = 0; i < listLoTrinh[n].xetronglotrinh.length / 2; i++) {
             for (let m = i; j < chuyenve.length; j++) {
               chuyenve[m].coach = listLoTrinh[n].xetronglotrinh[i];
@@ -160,11 +160,11 @@ export async function createChuyenXeSeed() {
             }
           }
         }
-        listChuyenXeCuoiCung.push(...chuyendi,...chuyenve)
-        chuyendi=[];
-        chuyenve=[];
+        listChuyenXeCuoiCung.push(...chuyendi, ...chuyenve);
+        chuyendi = [];
+        chuyenve = [];
       }
-    };
+    }
 
     return await ChuyenxeModel.insertMany(listChuyenXeCuoiCung);
   } catch (err) {
@@ -190,112 +190,115 @@ export async function generateChuyenInDay() {
     for (let n = 0; n < listLoTrinh.length; n++) {
       const listdi = [];
       const listve = [];
-      for (let i = 6; i <= 17; i++) {
-        const chuyenDi1 = {
-          tenchuyen: `${listLoTrinh[n].routeOfTrip.from}-${listLoTrinh[n]
-            .routeOfTrip.to}:${i}:00 `,
-          timeStart: moment()
-            // .add(j, 'day')
-            .set({ hour: i, minute: 0, second: 0 }),
-          timeEnd: moment()
-            // .add(j, 'day')
-            .set({
-              hour: i + listLoTrinh[n].thoigianvanchuyen,
-              minute: 0,
-              second: 0,
-            }),
-          routeOfTrip: listLoTrinh[n]._id,
-          // thanhtrakiemtra: [],
-          // laixevaphuxe: [],
-          ticketsInChuyen: [],
-          choNgoi: 45,
-          tinhtrang: [],
-          loai: 'DI',
-          coach: null,
-        };
-        const chuyenDi2 = {
-          tenchuyen: `${listLoTrinh[n].routeOfTrip.from}-${listLoTrinh[n]
-            .routeOfTrip.to}:${i}:30 `,
-          timeStart: moment()
-            // .add(j, 'day')
-            .set({ hour: i, minute: 30, second: 0 }),
-          timeEnd: moment()
-            // .add(j, 'day')
-            .set({
-              hour: i + listLoTrinh[n].thoigianvanchuyen,
-              minute: 30,
-              second: 0,
-            }),
-          routeOfTrip: listLoTrinh[n]._id,
-          // thanhtrakiemtra: [],
-          // ticketsInChuyen: [],
-          choNgoi: 45,
-          tinhtrang: [],
-          loai: 'DI',
-          coach: null,
-        };
-        const chuyenVe1 = {
-          tenchuyen: `${listLoTrinh[n].routeOfTrip.to}-${listLoTrinh[n]
-            .routeOfTrip.from}:${i}:00 `,
-          timeStart: moment()
-            // .add(j, 'day')
-            .set({ hour: i, minute: 0 }),
-          timeEnd: moment()
-            // .add(j, 'day')
-            .set({
-              hour: i + listLoTrinh[n].thoigianvanchuyen,
-              minute: 0,
-              second: 0,
-            }),
-          routeOfTrip: listLoTrinh[n]._id,
-          // thanhtrakiemtra: [],
-          ticketsInChuyen: [],
-          choNgoi: 45,
-          tinhtrang: [],
-          loai: 'VE',
-          coach: null,
-        };
-        const chuyenVe2 = {
-          tenchuyen: `${listLoTrinh[n].routeOfTrip.to}-${listLoTrinh[n]
-            .routeOfTrip.from}:${i}:30 `,
-          timeStart: moment()
-            // .add(j, 'day')
-            .set({ hour: i, minute: 30 }),
-          timeEnd: moment()
-            // .add(j, 'day')
-            .set({
-              hour: i + listLoTrinh[n].thoigianvanchuyen,
-              minute: 30,
-              second: 0,
-            }),
-          routeOfTrip: listLoTrinh[n]._id,
-          // thanhtrakiemtra: [],
-          ticketsInChuyen: [],
-          choNgoi: 45,
-          tinhtrang: [],
-          loai: 'VE',
-          coach: null,
-        };
-        listdi.push(...[chuyenDi1, chuyenDi2]);
-        listve.push(...[chuyenVe1, chuyenVe2]);
-        console.log('===============trk for================');
-        console.log(listdi.length);
-        console.log(listve.length);
-        console.log('===============================');
+      if (listLoTrinh[n].xetronglotrinh.length > 0) {
+        for (let i = 6; i <= 17; i++) {
+          const chuyenDi1 = {
+            tenchuyen: `${listLoTrinh[n].routeOfTrip.from}-${listLoTrinh[n]
+              .routeOfTrip.to}:${i}:00 `,
+            timeStart: moment()
+              // .add(j, 'day')
+              .set({ hour: i, minute: 0, second: 0 }),
+            timeEnd: moment()
+              // .add(j, 'day')
+              .set({
+                hour: i + listLoTrinh[n].thoigianvanchuyen,
+                minute: 0,
+                second: 0,
+              }),
+            routeOfTrip: listLoTrinh[n]._id,
+            // thanhtrakiemtra: [],
+            // laixevaphuxe: [],
+            ticketsInChuyen: [],
+            choNgoi: 45,
+            tinhtrang: [],
+            loai: 'DI',
+            coach: null,
+          };
+          const chuyenDi2 = {
+            tenchuyen: `${listLoTrinh[n].routeOfTrip.from}-${listLoTrinh[n]
+              .routeOfTrip.to}:${i}:30 `,
+            timeStart: moment()
+              // .add(j, 'day')
+              .set({ hour: i, minute: 30, second: 0 }),
+            timeEnd: moment()
+              // .add(j, 'day')
+              .set({
+                hour: i + listLoTrinh[n].thoigianvanchuyen,
+                minute: 30,
+                second: 0,
+              }),
+            routeOfTrip: listLoTrinh[n]._id,
+            // thanhtrakiemtra: [],
+            // ticketsInChuyen: [],
+            choNgoi: 45,
+            tinhtrang: [],
+            loai: 'DI',
+            coach: null,
+          };
+          const chuyenVe1 = {
+            tenchuyen: `${listLoTrinh[n].routeOfTrip.to}-${listLoTrinh[n]
+              .routeOfTrip.from}:${i}:00 `,
+            timeStart: moment()
+              // .add(j, 'day')
+              .set({ hour: i, minute: 0 }),
+            timeEnd: moment()
+              // .add(j, 'day')
+              .set({
+                hour: i + listLoTrinh[n].thoigianvanchuyen,
+                minute: 0,
+                second: 0,
+              }),
+            routeOfTrip: listLoTrinh[n]._id,
+            // thanhtrakiemtra: [],
+            ticketsInChuyen: [],
+            choNgoi: 45,
+            tinhtrang: [],
+            loai: 'VE',
+            coach: null,
+          };
+          const chuyenVe2 = {
+            tenchuyen: `${listLoTrinh[n].routeOfTrip.to}-${listLoTrinh[n]
+              .routeOfTrip.from}:${i}:30 `,
+            timeStart: moment()
+              // .add(j, 'day')
+              .set({ hour: i, minute: 30 }),
+            timeEnd: moment()
+              // .add(j, 'day')
+              .set({
+                hour: i + listLoTrinh[n].thoigianvanchuyen,
+                minute: 30,
+                second: 0,
+              }),
+            routeOfTrip: listLoTrinh[n]._id,
+            // thanhtrakiemtra: [],
+            ticketsInChuyen: [],
+            choNgoi: 45,
+            tinhtrang: [],
+            loai: 'VE',
+            coach: null,
+          };
+          listdi.push(...[chuyenDi1, chuyenDi2]);
+          listve.push(...[chuyenVe1, chuyenVe2]);
+          console.log('===============trk for================');
+          console.log(listdi.length);
+          console.log(listve.length);
+          console.log('===============================');
+        }
       }
+
       console.log('===============Ra khoi for================');
       console.log(listdi.length);
       console.log(listve.length);
       console.log('===============================');
       // phan cong chuyen di
-      for (let i = 0; i < (listLoTrinh[n].xetronglotrinh.length / 2); i++) {
+      for (let i = 0; i < listLoTrinh[n].xetronglotrinh.length / 2; i++) {
         // for (let j = i; j < (listLoTrinh[n].xetronglotrinh.length / 2)-1; j++) {
-          // console.log('================tesst data===============');
-          // console.log(i);
-          // console.log(listdi[i]);
-          // console.log(listdi[i+16]);
-          // console.log(i+16);
-          // console.log('===============================');
+        // console.log('================tesst data===============');
+        // console.log(i);
+        // console.log(listdi[i]);
+        // console.log(listdi[i+16]);
+        // console.log(i+16);
+        // console.log('===============================');
         // }
         listdi[i].coach = listLoTrinh[n].xetronglotrinh[i];
         listdi[i + 16].coach = listLoTrinh[n].xetronglotrinh[i];
@@ -307,11 +310,15 @@ export async function generateChuyenInDay() {
         }
       }
       for (
-        let i = (listLoTrinh[n].xetronglotrinh.length / 2)-1;
+        let i = listLoTrinh[n].xetronglotrinh.length / 2 - 1;
         i < listLoTrinh[n].xetronglotrinh.length / 2;
         i++
       ) {
-        for (let j = i - 7; j < listLoTrinh[n].xetronglotrinh.length / 2 - 1; j++) {
+        for (
+          let j = i - 7;
+          j < listLoTrinh[n].xetronglotrinh.length / 2 - 1;
+          j++
+        ) {
           listve[j].coach = listLoTrinh[n].xetronglotrinh[i];
           listve[j + 16].coach = listLoTrinh[n].xetronglotrinh[i];
         }

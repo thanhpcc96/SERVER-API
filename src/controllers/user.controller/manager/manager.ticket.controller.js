@@ -61,7 +61,7 @@ export async function getTicketbyID(req, res, next) {
   try {
     const info = await TicketModel.findById(body.mave)
       .populate('inChuyenXe')
-      .populate('Customer', 'info.fullname');
+      .populate('Customer');
     if (!info) {
       return res.status(HTTPStatus.BAD_REQUEST).json({
         err: true,

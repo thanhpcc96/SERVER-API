@@ -44,10 +44,15 @@ export const clientSocket = io => {
             listchuyen,
           });
         }
+        // const userID= await TicketModel.find({Customer : ClientID})
+        //                       .populate({
+        //                         path: "inChuyenXe",
+        //                         match: { timeStart: { }}                              })
+        //      .
         const result = await chuyenxeModel
           .find({
             //timeStart: { $gte: momment().subtract(2, 'day') },
-            timeStart: { $gte: momment().add(1,'hour')}
+            timeStart: { $gte: momment().add(30, 'minute') },
           })
           .populate('routeOfTrip', 'routeOfTrip.lotrinh')
           .populate({
@@ -61,22 +66,35 @@ export const clientSocket = io => {
           });
         }
         listchuyen = result;
+        let timeTemp;
         for (let i = 0; i < listchuyen.length; i++) {
           for (let j = 0; j < listchuyen[i].ticketsInChuyen.length; j++) {
             if (
               listchuyen[i].ticketsInChuyen[j].Customer.toString() === ClientID
             ) {
-              listchuyen.splice(i, 1);
+              timeTemp = listchuyen[i].timeStart;
+              //listchuyen.splice(i, 1);
             }
           }
         }
+        const chuyensaufillter = [];
+        for (let i = 0; i < listchuyen.length; i++) {
+          if (
+            momment(timeTemp).add(4, 'hour') < momment(listchuyen[i].timeStart)
+          ) {
+            chuyensaufillter.push(listchuyen[i]);
+          }
+        }
+        console.log('=============chuyensaufillter.length==================');
+        console.log(chuyensaufillter.length);
+        console.log('===============================');
         socket.emit('updateListChuyenxe', {
           type: 'GET_LIST_CHUYEN_SUCCESS',
-          result: listchuyen,
+          result: chuyensaufillter,
         });
         socket.broadcast.emit('updateListChuyenxe', {
           type: 'GET_LIST_CHUYEN_SUCCESS',
-          result: listchuyen,
+          result: chuyensaufillter,
         });
       } catch (err) {
         socket.emit('updateListChuyenxe', {
@@ -205,9 +223,12 @@ export const clientSocket = io => {
             giacuoc += tuyenResult.routeOfTrip.giacuoc[i];
           }
         }
-        socket.emit("tinhgiaResult",{type: "TINH_GIA_THANH_CONG", result: giacuoc})
+        socket.emit('tinhgiaResult', {
+          type: 'TINH_GIA_THANH_CONG',
+          result: giacuoc,
+        });
       } catch (error) {
-        socket.emit("tinhgiaResult",{type: "TINH_GIA_THAT_BAI", error})
+        socket.emit('tinhgiaResult', { type: 'TINH_GIA_THAT_BAI', error });
       }
     });
 
@@ -288,6 +309,11 @@ export const clientSocket = io => {
     /** Cancel chuyen */
     socket.on('cancelChuyen', async info => {
       const { chuyenxeID, clientID, ticketID } = info;
+      console.log(
+        '==============cancel chuyencancel chuyencancel chuyencancel chuyencancel chuyen=================',
+      );
+      console.log('cancel chuyen', info);
+      console.log('===============================');
       const arrPromise = await Promise.all([
         TicketModel.findById(ticketID),
         ClientModel.findById(clientID),
@@ -302,7 +328,7 @@ export const clientSocket = io => {
         /* Remove vé ra khỏi lịch đặt chỗ của khách hàng */
         clientResult.acount_payment.history_pick_keep_seat.remove(ticketID);
         /* Push vé vừa hủy vảo lịch sử Hủy chuyến */
-        clientIDResult.acount_payment.history_cancel_ticket.push(ticketID);
+        clientResult.acount_payment.history_cancel_ticket.push(ticketID);
         /* Update trạng thái vé về hủy bỏ ====> Middleware sẽ auto remove vé khỏi xe */
         ticketResult.isAvaiable = true;
       }
@@ -310,7 +336,7 @@ export const clientSocket = io => {
         /* Remove vé ra khỏi lịch sử giao dịch của khách hàng thanh toán trước*/
         clientResult.acount_payment.history_pick_keep_seat.remove(ticketID);
         /* Push vé vừa hủy vảo lịch sử Hủy chuyến */
-        clientIDResult.acount_payment.history_cancel_ticket.push(ticketID);
+        clientResult.acount_payment.history_cancel_ticket.push(ticketID);
         /* Đồng thời hoàn lại 80% số tiền so với giá trị vé lại cho khách hành*/
         clientResult.acount_payment.balance =
           clientResult.acount_payment.balance + 80 * ticketResult.price / 100;
@@ -326,11 +352,15 @@ export const clientSocket = io => {
         ticketAffterSave = arrPromiseSaved[0];
       if (!clientAfterSave || !ticketAffterSave) {
         socket.emit('cancelResult', {
-          type: 'CANCEL_TICKET_ERROR',
+          type: 'CANCEL_CHUYEN_ERROR',
           error: new Error('Co loi xay ra, vui long thu lai'),
         });
         return;
       }
+      socket.emit('cancelResult', {
+        type: 'CANCEL_CHUYEN_SUCCESS',
+        message: 'huy dang ky chuyen thanh cong',
+      });
       socket.broadcast.emit('listChuyenChanged');
       listchuyen = [];
     });

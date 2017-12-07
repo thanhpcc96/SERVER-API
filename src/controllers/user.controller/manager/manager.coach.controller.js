@@ -19,7 +19,7 @@ export const validation = {
   updateCoach: {
     body: {
       idxe: Joi.string().required(),
-      seat: Joi.number().required(),
+      seat: Joi.number(),
       name: Joi.string(),
       productiontime: Joi.date(),
     },
@@ -33,7 +33,9 @@ export const validation = {
 
 export async function getAllCoach(req, res, next) {
   try {
-    const kq = await CoachModel.find();
+    const kq = await CoachModel.find()
+      .populate('phutrach.laixe', 'info.fullname')
+      .populate('phutrach.phuxe', 'info.fullname');
     return res
       .status(HTTPstatus.OK)
       .json({ err: false, length: kq.length, result: kq });
@@ -125,14 +127,40 @@ export async function deleteCoach(req, res, next) {
 }
 
 export async function updateCoach(req, res, next) {
-  const whiteList = ['idxe', 'numberplate', 'seat', 'name', 'productiontime'];
+  const whiteList = [
+    'idxe',
+    'numberplate',
+    'seat',
+    'name',
+    'productiontime',
+    'idlaixe',
+    'idphuxe',
+  ];
   const body = filteredBody(req.body, whiteList);
   try {
     const oldCoach = await CoachModel.findById(body.idxe);
+    let idlaixe;
+    let idphuxe;
+    let laixeResult;
+    let phuxeResult;
+    if (body.idlaixe) {
+      idlaixe = oldCoach.phutrach.laixe;
+    }
+    if (body.idphuxe) {
+      idphuxe = oldCoach.phutrach.phuxe;
+    }
+    if(idlaixe){
+      laixeResult= await UserModel.findById(idlaixe);
+    }
+    if(idlaixe){
+      phuxeResult= await UserModel.findById(idphuxe);
+    }
     oldCoach.numberplate = body.numberplate || oldCoach.numberplate;
     oldCoach.seat = body.seat || oldCoach.seat;
     oldCoach.name = body.name || oldCoach.name;
     oldCoach.productiontime = body.productiontime || oldCoach.productiontime;
+    oldCoach.phutrach.laixe = body.idlaixe || oldCoach.phutrach.laixe;
+    oldCoach.phutrach.phuxe = body.idphuxe || oldCoach.phutrach.phuxe;
     agenda.now('savelog', {
       user: req.user._id,
       action: {
@@ -142,9 +170,14 @@ export async function updateCoach(req, res, next) {
       status: 'SUCCESS',
       time: Date.now(),
     });
+    const arrPromise= await Promise.all([
+      laixeResult.removeXePhanCong(),
+      phuxeResult.removeXePhanCong(),
+      oldCoach.save(),
+    ])
     return res
       .status(HTTPstatus.OK)
-      .json({ err: false, result: await oldCoach.save() });
+      .json({ err: false, result: arrPromise[2] });
   } catch (err) {
     agenda.now('savelog', {
       user: req.user._id,

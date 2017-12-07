@@ -27,7 +27,7 @@ route.post(
 );
 
 route.post(
-  '/coach',
+  '/update',
   authJwt,
   validate(validation.updateCoach),
   managerCoach.updateCoach,

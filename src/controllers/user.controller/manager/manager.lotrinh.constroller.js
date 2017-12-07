@@ -8,13 +8,14 @@ import agenda from '../../../jobLoader';
 export const vaildation = {
   creatTuyen: {
     body: {
-      from: Joi.string().required(),
-      to: Joi.string().required(),
+      diemdau: Joi.string().required(),
+      diemcuoi: Joi.string().required(),
       lotrinh: Joi.string().required(),
-      vitriChotKT: Joi.string().required(),
-      gpxFileName: Joi.string().required(),
+      gia: Joi.string().required(),
+      vitriChotKT: Joi.string(),
+      gpxFileName: Joi.string(),
       thoigianvanchuyen: Joi.number().required(),
-      xetronglotrinh: Joi.string(),
+     // xetronglotrinh: Joi.string(),
     },
   },
   updateTuyen: {
@@ -32,9 +33,10 @@ export const vaildation = {
 };
 export async function creatTuyen(req, res, next) {
   const whitelist = [
-    'from',
-    'to',
+    'diemdau',
+    'diemcuoi',
     'lotrinh',
+    "gia",
     'thoigianvanchuyen',
     'vitriChotKT',
     'gpxFileName',
@@ -43,16 +45,14 @@ export async function creatTuyen(req, res, next) {
   const body = filteredBody(req.body, whitelist);
   try {
     const lotrinhArr = body.lotrinh.split(';');
-    const vitrichokt = body.vitriChotKT.split(';');
     const dataFromBody = {
       routeOfTrip: {
-        from: body.from,
-        to: body.to,
+        from: body.diemdau,
+        to: body.diemcuoi,
         lotrinh: lotrinhArr,
       },
       thoigianvanchuyen: body.thoigianvanchuyen,
-      vitriChotKT: vitrichokt,
-      gpxFileName: body.gpxFileName,
+      gpxFileName: body.gpxFileName || null,
     };
     let xetronglotrinhArr;
     if (body.xetronglotrinh) {
@@ -61,6 +61,16 @@ export async function creatTuyen(req, res, next) {
       console.log(xetronglotrinhArr.length);
       console.log('===============================');
       dataFromBody.xetronglotrinh = xetronglotrinhArr;
+    }
+    let giaArr;
+    if(body.gia){
+      giaArr= body.gia.split(';');
+      dataFromBody.routeOfTrip.giacuoc=giaArr;
+    }
+    let vitrichoktArr;
+    if(body.vitriChotKT){
+      vitrichoktArr= body.vitriChotKT.split(';');
+      dataFromBody.vitriChotKT=vitrichoktArr;
     }
     const result = await LotrinhModel.create(dataFromBody);
     agenda.now('savelog', {

@@ -2,8 +2,10 @@ import HTTPStatus from 'http-status';
 import fs from 'fs';
 import path from 'path';
 import Joi from 'joi';
+import moment from 'moment';
 
 import User from '../../../models/user.model';
+import ChuyenxeModel from '../../../models/chuyenxe.model';
 import { filteredBody } from '../../../ultils/filterBody';
 import constants from '../../../config/constants';
 
@@ -15,12 +17,12 @@ export const validation = {
   },
   updateInfo: {
     body: {
-      fullname: Joi.string(),
-      address: Joi.string(),
-      dateofbirth: Joi.date(),
-      email: Joi.string().email(),
-      passport: Joi.string(),
-      phone: Joi.string().regex(/^[0-9-+]+$/),
+      // fullname: Joi.string(),
+      // address: Joi.string(),
+      // dateofbirth: Joi.date(),
+      // email: Joi.string().email(),
+      // passport: Joi.string(),
+      // phone: Joi.string().regex(/^[0-9-+]+$/),
     },
   },
   createUser: {
@@ -241,6 +243,71 @@ export async function _postUpdateInfo(req, res, next) {
     return next(err);
   }
 }
+export async function _getPhanCongNhanVien(req, res, next) {
+  try {
+    const chuyens = await ChuyenxeModel.find({
+      timeStart: {
+        $gte: moment().set({ hour: 0, minute: 0, second: 0 }),
+        $lte: moment().set({ hour: 23, minute: 59, second: 0 }),
+      },
+    }).populate('coach');
+
+    if (req.user.role === 2) {
+      const lich = [];
+      chuyens.forEach(chuyen => {
+        console.log('===============================');
+        console.log(chuyen);
+        console.log('===============================');
+        if (chuyen.coach!==null) {
+          if (chuyen.coach.phancong) {
+            if (chuyen.coach.phancong.laixe) {
+              if (chuyen.coach.phutrach.laixe === req.user._id.toString()) {
+                console.log(
+                  '============req.user._id===phu xe================',
+                );
+                console.log(req.user._id);
+                console.log('===============================');
+                lich.push(chuyen);
+              }
+            }
+          }
+        }
+      });
+      return res.status(HTTPStatus.OK).json({ err: false, result: lich , chuyens});
+    }
+    if (req.user.role === 3) {
+      const lich = [];
+      chuyens.forEach(chuyen => {
+        console.log('===============================');
+        console.log(chuyen);
+        console.log('===============================');
+        if (chuyen.coach!==null) {
+          if (chuyen.coach.phancong) {
+            if (chuyen.coach.phancong.phuxe) {
+              if (chuyen.coach.phutrach.phuxe === req.user._id.toString()) {
+                console.log(
+                  '============req.user._id===phu xe================',
+                );
+                console.log(req.user._id);
+                console.log('===============================');
+                lich.push(chuyen);
+              }
+            }
+          }
+        }
+      });
+      return res.status(HTTPStatus.OK).json({ err: false, result: lich , chuyens});
+    }
+    return res.status(HTTPStatus.BAD_REQUEST).json({
+      err: true,
+      message: 'Khong co phan cong',
+      chuyens,
+    });
+  } catch (error) {
+    error.status = HTTPStatus.BAD_REQUEST;
+    next(error);
+  }
+}
 
 export async function _getListLaiXeChuaPhanCong(req, res, next) {
   try {
@@ -268,9 +335,6 @@ export async function _getListPhuXeChuaPhanCong(req, res, next) {
         kq.push(user);
       }
     });
-    console.log('===============================');
-    console.log(kq);
-    console.log('===============================');
     return res
       .status(HTTPStatus.OK)
       .json({ err: false, soluong: kq.length, result: kq });

@@ -41,5 +41,6 @@ routes.post('/update', authJwt,validate(validation.updateInfo) ,controller._post
 
 routes.get('/laixe', authJwt, controller._getListLaiXeChuaPhanCong);
 routes.get('/phuxe', authJwt, controller._getListPhuXeChuaPhanCong);
+routes.get('/phancong', authJwt, controller._getPhanCongNhanVien);
 
 export default routes;

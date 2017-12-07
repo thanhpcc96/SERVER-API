@@ -34,6 +34,10 @@ const coachSchema = new Schema(
         ref: 'users',
       },
     },
+    trongtuyen: {
+      type: Schema.Types.ObjectId,
+      ref: 'lotrinh'
+    }
   },
   { timestamps: true },
 );

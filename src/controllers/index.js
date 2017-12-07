@@ -6,7 +6,8 @@ import {
   _generateChuyenSeed,
   _deleteAllChuyen,
   _generateChuyenInDay,
-  getUserSeeds
+  getUserSeeds,
+  _generratePhanCong
 } from './seed.controller';
 
 export {
@@ -18,5 +19,6 @@ export {
   _generateChuyenSeed,
   _deleteAllChuyen,
   _generateChuyenInDay,
-  getUserSeeds
+  getUserSeeds,
+  _generratePhanCong
 };

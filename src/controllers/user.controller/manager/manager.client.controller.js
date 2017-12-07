@@ -96,12 +96,15 @@ export async function _putRechairCoin(req, res, next) {
   const body = filteredBody(req.body, constants.WHITELIST.manager.rechairCoin);
   try {
     const user = req.user;
-    if (user.role !== 1) {
-      return res.status(HTTPStatus.FORBIDDEN).json({
-        err: true,
-        message: 'Ban khong co quyen truy cap chuc nang nay!',
-      });
-    }
+    console.log('===============================');
+    console.log(user);
+    console.log('===============================');
+    // if (user.role !== 1) {
+    //   return res.status(HTTPStatus.FORBIDDEN).json({
+    //     err: true,
+    //     message: 'Ban khong co quyen truy cap chuc nang nay!',
+    //   });
+    // }
     const client = await Client.findById(body.idclient);
     if (!client) {
       return res
@@ -164,6 +167,20 @@ export async function _getInfoClient(req, res, next) {
       .populate('acount_payment.history_transaction')
       .populate('acount_payment.history_pick_keep_seat')
       .populate('acount_payment.history_cancel_ticket');
+    return res.status(HTTPStatus.OK).json({ err: false, result: kq });
+  } catch (err) {
+    err.status = HTTPStatus.BAD_REQUEST;
+    return next(err);
+  }
+}
+export async function _postTogetInfoClient(req, res, next) {
+  const body = filteredBody(req.body, ['email']);
+  try {
+    const kq = await Client.findOne({"local.email": body.email})
+      // .populate('acount_payment.history_recharge.idUser')
+      // .populate('acount_payment.history_transaction')
+      // .populate('acount_payment.history_pick_keep_seat')
+      // .populate('acount_payment.history_cancel_ticket');
     return res.status(HTTPStatus.OK).json({ err: false, result: kq });
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;

@@ -13,6 +13,8 @@ import managerChuyenXe from './user.router/manager.chuyenxe.router';
 import managerTuyen from './user.router/manager.lotrinh.router';
 import managerLog from './user.router/manager.log.router';
 
+import managerPhanCong from './user.router/manager.phancong.router';
+
 import seedingRoute from './seeding';
 
 import APIError from '../services/error';
@@ -59,6 +61,11 @@ routes.use('/manager/chuyenxe', managerChuyenXe);
  * quan li tuyen xe
  */
 routes.use('/manager/tuyen', managerTuyen);
+
+/**
+ * quan ly phan cong
+ */
+routes.use('/manager/phancong',managerPhanCong)
 
 /**
  * quan li log
